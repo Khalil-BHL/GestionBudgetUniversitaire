@@ -2,9 +2,9 @@ import React from 'react';
 import './App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from './LoginPage/login';
-import Dashboard from './DashboardPage/dashboard';
+import Dashboard from './ProfInterface/DashboardPage/dashboard';
 import Layout from './ProfInterface/Layout';
-import RequestPage from './ProfInterface/DashboardPage/RequestPage/RequestPage';
+import RequestPage from './ProfInterface/RequestPage/RequestPage';
 
 function App() {
   return (
