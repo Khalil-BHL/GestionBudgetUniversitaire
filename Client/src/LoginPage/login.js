@@ -1,17 +1,62 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import './login.css';
-import estLogo from '../assets/ESTLOGO.webp'; // Adjust the path if needed
+import estLogo from '../assets/ESTLOGO.webp';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log('Login attempt with:', { email, password, rememberMe });
+    setLoading(true);
+    setError('');
+
+    try {
+      console.log('Sending login request...');
+      const response = await axios.post('http://localhost:5000/api/auth/login', {
+        email,
+        password
+      });
+      
+      console.log('Login response:', response.data);
+
+      // Store user data
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+
+      // Redirect based on role
+      switch (response.data.user.role) {
+        case 'professor':
+        case 'Prof':
+          navigate('/professor/dashboard');
+          break;
+        case 'comptable':
+        case 'Comptable':
+          navigate('/comptable/dashboard');
+          break;
+        case 'directeur':
+        case 'Direction':
+          navigate('/direction/dashboard');
+          break;
+        case 'chef_departement':
+        case 'Chef Departement':
+          navigate('/chef-departement/dashboard');
+          break;
+        default:
+          console.warn('Unknown role:', response.data.user.role);
+          navigate('/');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setError(err.response?.data?.message || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -21,7 +66,6 @@ function Login() {
         <div className="logo-section">
           <div className="logo-container">
             <img src={estLogo} alt="EST Logo" className="est-logo" />
-            {/* School info div removed as requested */}
           </div>
         </div>
         
@@ -29,6 +73,8 @@ function Login() {
           <h1 className="app-title">
             UNI<span className="budget-part">BUDGET</span>
           </h1>
+          
+          {error && <div className="error-message">{error}</div>}
           
           <form onSubmit={handleSubmit}>
             <div className="input-group">
@@ -38,7 +84,7 @@ function Login() {
                 <input 
                   type="email" 
                   id="email" 
-                  placeholder="example@gmail.com" 
+                  placeholder="professor@univ.edu" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -62,26 +108,20 @@ function Login() {
                   type="button" 
                   className="toggle-password"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? "👁️" : "👁️"}
                 </button>
               </div>
             </div>
             
-            <div className="form-footer">
-              <div className="remember-me">
-                <input 
-                  type="checkbox" 
-                  id="remember" 
-                  checked={rememberMe}
-                  onChange={() => setRememberMe(!rememberMe)}
-                />
-                <label htmlFor="remember">Remember me</label>
-              </div>
-              <a href="#" className="forgot-password">Forgot Password?</a>
-            </div>
-            
-            <button type="submit" className="login-button">Login</button>
+            <button 
+              type="submit" 
+              className="login-button"
+              disabled={loading}
+            >
+              {loading ? 'Logging in...' : 'Login'}
+            </button>
           </form>
         </div>
       </div>

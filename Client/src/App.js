@@ -2,18 +2,47 @@ import React from 'react';
 import './App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from './LoginPage/login';
-import Dashboard from './ProfInterface/DashboardPage/dashboard';
-import Layout from './ProfInterface/Layout';
+
+// Professor components
+import ProfDashboard from './ProfInterface/DashboardPage/dashboard';
+import ProfLayout from './ProfInterface/Layout';
 import RequestPage from './ProfInterface/RequestPage/RequestPage';
+
+// Placeholder components for other roles (to be implemented later)
+const ComptableDashboard = () => <div>Comptable Dashboard (To be implemented)</div>;
+const ComptableLayout = ({ children }) => <div className="dashboard-container">{children}</div>;
+
+const DirectionDashboard = () => <div>Direction Dashboard (To be implemented)</div>;
+const DirectionLayout = ({ children }) => <div className="dashboard-container">{children}</div>;
+
+const ChefDepartementDashboard = () => <div>Chef Departement Dashboard (To be implemented)</div>;
+const ChefDepartementLayout = ({ children }) => <div className="dashboard-container">{children}</div>;
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/" element={<Layout />}>
-          <Route path="dashboard" element={<Dashboard />} />
+        
+        {/* Professor routes */}
+        <Route path="/professor" element={<ProfLayout />}>
+          <Route path="dashboard" element={<ProfDashboard />} />
           <Route path="request" element={<RequestPage />} />
+        </Route>
+        
+        {/* Comptable routes */}
+        <Route path="/comptable" element={<ComptableLayout />}>
+          <Route path="dashboard" element={<ComptableDashboard />} />
+        </Route>
+        
+        {/* Direction routes */}
+        <Route path="/direction" element={<DirectionLayout />}>
+          <Route path="dashboard" element={<DirectionDashboard />} />
+        </Route>
+        
+        {/* Chef Departement routes */}
+        <Route path="/chef-departement" element={<ChefDepartementLayout />}>
+          <Route path="dashboard" element={<ChefDepartementDashboard />} />
         </Route>
       </Routes>
     </BrowserRouter>

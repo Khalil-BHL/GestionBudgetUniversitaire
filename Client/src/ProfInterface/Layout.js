@@ -13,13 +13,13 @@ function Layout() {
         <nav className="sidebar-nav">
           <ul>
             <li>
-              <Link to="/dashboard" className="nav-item">
+              <Link to="/professor/dashboard" className="nav-item">
                 <span className="icon">📊</span>
                 <span>Tableau de bord</span>
               </Link>
             </li>
             <li>
-              <Link to="/request" className="nav-item">
+              <Link to="/professor/request" className="nav-item">
                 <span className="icon">➕</span>
                 <span>Nouvelle demande</span>
               </Link>
