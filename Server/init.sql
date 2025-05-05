@@ -56,14 +56,7 @@ CREATE TABLE purchase_requests (
     FOREIGN KEY (type_marche_id) REFERENCES type_marches(id)
 );
 
--- Create purchase_items table
-CREATE TABLE purchase_items (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    request_id INT,
-    name VARCHAR(255) NOT NULL,
-    quantity INT NOT NULL,
-    FOREIGN KEY (request_id) REFERENCES purchase_requests(id)
-);
+
 
 -- Create notifications table
 CREATE TABLE notifications (
@@ -97,3 +90,11 @@ CREATE TABLE validations (
     FOREIGN KEY (request_id) REFERENCES purchase_requests(id)
 );
 -- the database is fully inserted
+
+-- saisir des entrées dans la table purchase_requests
+INSERT INTO `purchase_requests` (`id`, `user_id`, `title`, `description`, `status_id`, `type_marche_id`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Achat de chaises', 'Chaises pour la salle de réunion', 3, 2, NOW(), NOW()),
+(2, 1, 'Commande de PC portables', '5 PC portables pour les nouveaux employés', 4, 1, NOW(), NOW()),
+(3, 2, 'Matériel sanitaire', 'Réapprovisionnement de savon et papier', 2, 3, NOW(), NOW()),
+(4, 2, 'Achat projecteur', 'Projecteur pour salle de conférence', 1, 1, NOW(), NOW()),
+(5, 3, 'Bureau ergonomique', 'Nouveau bureau pour le manager', 5, 2, NOW(), NOW());
