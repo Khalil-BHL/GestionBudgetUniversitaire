@@ -2,7 +2,7 @@
 .dashboard-content {
   width: 100%;
   background-color: #f5f7fb;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   padding: 30px;
 }
 
@@ -256,7 +256,7 @@ tbody td {
   margin-top: 20px;
 }
 
-.pagination-arrow, 
+.pagination-arrow,
 .pagination-number {
   width: 30px;
   height: 30px;
@@ -295,19 +295,19 @@ tbody td {
   .dashboard-content {
     padding: 15px;
   }
-  
+
   .requests-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
-  
+
   .requests-actions {
     width: 100%;
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .search-container input {
     width: 100%;
   }
