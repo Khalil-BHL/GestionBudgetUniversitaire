@@ -1,62 +1,136 @@
-import React, { useState } from 'react';
-import './dashboard.css';
+import React, { useState } from "react";
+import "./dashboard.css";
 
 function Dashboard() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('Plus récent');
-  
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("Plus récent");
+
   // Sample data for the dashboard
   const stats = [
-    { title: 'Total Customers', value: '5,423', change: '+16%', color: '#e6f7ef' },
-    { title: 'Members', value: '1,893', change: '-1%', color: '#e6f7ef' },
-    { title: 'Active Now', value: '189', color: '#e6f7ef' }
+    {
+      title: "Total Customers",
+      value: "5,423",
+      change: "+16%",
+      color: "#e6f7ef",
+    },
+    { title: "Members", value: "1,893", change: "-1%", color: "#e6f7ef" },
+    { title: "Active Now", value: "189", color: "#e6f7ef" },
   ];
-  
+
   // Sample data for the table
   const requests = [
-    { id: '#000004', description: 'PCx4', type: 'Electronique', submissionDate: '23/04/2024', validationDate: '23/04/2024', status: 'Validée' },
-    { id: '#000004', description: 'PC', type: 'Electronique', submissionDate: '23/04/2024', validationDate: '23/04/2024', status: 'Approuvée' },
-    { id: '#000004', description: 'PC', type: 'Electronique', submissionDate: '23/04/2024', validationDate: '23/04/2024', status: 'En traitement' },
-    { id: '#000004', description: 'PC', type: 'Electronique', submissionDate: '23/04/2024', validationDate: '23/04/2024', status: 'En livraison' },
-    { id: '#000004', description: 'PC', type: 'Electronique', submissionDate: '23/04/2024', validationDate: '23/04/2024', status: 'Livrée' },
-    { id: '#000004', description: 'PC', type: 'Electronique', submissionDate: '23/04/2024', validationDate: '23/04/2024', status: 'Rejetée' },
-    { id: '#000004', description: 'PC', type: 'Electronique', submissionDate: '23/04/2024', validationDate: '23/04/2024', status: 'Active' },
-    { id: '#000004', description: 'PC', type: 'Electronique', submissionDate: '23/04/2024', validationDate: '23/04/2024', status: 'Inactive' }
+    {
+      id: "#000004",
+      description: "PCx4",
+      type: "Electronique",
+      submissionDate: "23/04/2024",
+      validationDate: "23/04/2024",
+      status: "Validée",
+    },
+    {
+      id: "#000004",
+      description: "PC",
+      type: "Electronique",
+      submissionDate: "23/04/2024",
+      validationDate: "23/04/2024",
+      status: "Approuvée",
+    },
+    {
+      id: "#000004",
+      description: "PC",
+      type: "Electronique",
+      submissionDate: "23/04/2024",
+      validationDate: "23/04/2024",
+      status: "En traitement",
+    },
+    {
+      id: "#000004",
+      description: "PC",
+      type: "Electronique",
+      submissionDate: "23/04/2024",
+      validationDate: "23/04/2024",
+      status: "En livraison",
+    },
+    {
+      id: "#000004",
+      description: "PC",
+      type: "Electronique",
+      submissionDate: "23/04/2024",
+      validationDate: "23/04/2024",
+      status: "Livrée",
+    },
+    {
+      id: "#000004",
+      description: "PC",
+      type: "Electronique",
+      submissionDate: "23/04/2024",
+      validationDate: "23/04/2024",
+      status: "Rejetée",
+    },
+    {
+      id: "#000004",
+      description: "PC",
+      type: "Electronique",
+      submissionDate: "23/04/2024",
+      validationDate: "23/04/2024",
+      status: "Active",
+    },
+    {
+      id: "#000004",
+      description: "PC",
+      type: "Electronique",
+      submissionDate: "23/04/2024",
+      validationDate: "23/04/2024",
+      status: "Inactive",
+    },
   ];
-  
+
   // Function to get status badge class based on status
   const getStatusBadgeClass = (status) => {
-    switch(status) {
-      case 'Validée': return 'status-validated';
-      case 'Approuvée': return 'status-approved';
-      case 'En traitement': return 'status-processing';
-      case 'En livraison': return 'status-delivery';
-      case 'Livrée': return 'status-delivered';
-      case 'Rejetée': return 'status-rejected';
-      case 'Active': return 'status-active';
-      case 'Inactive': return 'status-inactive';
-      default: return '';
+    switch (status) {
+      case "Validée":
+        return "status-validated";
+      case "Approuvée":
+        return "status-approved";
+      case "En traitement":
+        return "status-processing";
+      case "En livraison":
+        return "status-delivery";
+      case "Livrée":
+        return "status-delivered";
+      case "Rejetée":
+        return "status-rejected";
+      case "Active":
+        return "status-active";
+      case "Inactive":
+        return "status-inactive";
+      default:
+        return "";
     }
   };
-  
+
   return (
     <div className="dashboard-content">
       <header className="dashboard-header">
         <h2>Bonjour 👋</h2>
       </header>
-      
+
       {/* Stats cards */}
       <div className="stats-container">
         {stats.map((stat, index) => (
           <div className="stat-card" key={index}>
             <div className="stat-icon" style={{ backgroundColor: stat.color }}>
-              <span>{stat.icon || '📊'}</span>
+              <span>{stat.icon || "📊"}</span>
             </div>
             <div className="stat-info">
               <p className="stat-title">{stat.title}</p>
               <h3 className="stat-value">{stat.value}</h3>
               {stat.change && (
-                <p className={`stat-change ${stat.change.startsWith('+') ? 'positive' : 'negative'}`}>
+                <p
+                  className={`stat-change ${
+                    stat.change.startsWith("+") ? "positive" : "negative"
+                  }`}
+                >
                   {stat.change} this month
                 </p>
               )}
@@ -74,7 +148,7 @@ function Dashboard() {
           </div>
         ))}
       </div>
-      
+
       {/* Requests section */}
       <div className="requests-section">
         <div className="requests-header">
@@ -82,9 +156,9 @@ function Dashboard() {
           <div className="requests-actions">
             <div className="search-container">
               <span className="search-icon">🔍</span>
-              <input 
-                type="text" 
-                placeholder="Rechercher" 
+              <input
+                type="text"
+                placeholder="Rechercher"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -99,7 +173,7 @@ function Dashboard() {
             </div>
           </div>
         </div>
-        
+
         {/* Requests table */}
         <div className="requests-table">
           <table>
@@ -122,7 +196,11 @@ function Dashboard() {
                   <td>{request.submissionDate}</td>
                   <td>{request.validationDate}</td>
                   <td>
-                    <span className={`status-badge ${getStatusBadgeClass(request.status)}`}>
+                    <span
+                      className={`status-badge ${getStatusBadgeClass(
+                        request.status
+                      )}`}
+                    >
                       {request.status}
                     </span>
                   </td>
@@ -131,7 +209,7 @@ function Dashboard() {
             </tbody>
           </table>
         </div>
-        
+
         {/* Pagination */}
         <div className="pagination">
           <button className="pagination-arrow">◀️</button>
