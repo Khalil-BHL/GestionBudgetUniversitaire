@@ -1,109 +1,44 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "./dashboard.css";
 
 function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("Plus récent");
+  const [stats, setStats] = useState([]);
+  const [requests, setRequests] = useState([]);
 
-  // Sample data for the dashboard
-  const stats = [
-    {
-      title: "Total Customers",
-      value: "5,423",
-      change: "+16%",
-      color: "#e6f7ef",
-    },
-    { title: "Members", value: "1,893", change: "-1%", color: "#e6f7ef" },
-    { title: "Active Now", value: "189", color: "#e6f7ef" },
-  ];
-
-  // Sample data for the table
-  const requests = [
-    {
-      id: "#000004",
-      description: "PCx4",
-      type: "Electronique",
-      submissionDate: "23/04/2024",
-      validationDate: "23/04/2024",
-      status: "Validée",
-    },
-    {
-      id: "#000004",
-      description: "PC",
-      type: "Electronique",
-      submissionDate: "23/04/2024",
-      validationDate: "23/04/2024",
-      status: "Approuvée",
-    },
-    {
-      id: "#000004",
-      description: "PC",
-      type: "Electronique",
-      submissionDate: "23/04/2024",
-      validationDate: "23/04/2024",
-      status: "En traitement",
-    },
-    {
-      id: "#000004",
-      description: "PC",
-      type: "Electronique",
-      submissionDate: "23/04/2024",
-      validationDate: "23/04/2024",
-      status: "En livraison",
-    },
-    {
-      id: "#000004",
-      description: "PC",
-      type: "Electronique",
-      submissionDate: "23/04/2024",
-      validationDate: "23/04/2024",
-      status: "Livrée",
-    },
-    {
-      id: "#000004",
-      description: "PC",
-      type: "Electronique",
-      submissionDate: "23/04/2024",
-      validationDate: "23/04/2024",
-      status: "Rejetée",
-    },
-    {
-      id: "#000004",
-      description: "PC",
-      type: "Electronique",
-      submissionDate: "23/04/2024",
-      validationDate: "23/04/2024",
-      status: "Active",
-    },
-    {
-      id: "#000004",
-      description: "PC",
-      type: "Electronique",
-      submissionDate: "23/04/2024",
-      validationDate: "23/04/2024",
-      status: "Inactive",
-    },
-  ];
+  // Fetch data from backend
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/api/dashboard")
+      .then((res) => {
+        
+        setStats(res.data.stats);
+        setRequests(res.data.requests);
+      })
+      .catch((err) => {
+        console.error("Erreur lors de la récupération des données", err);
+      });
+  }, []);
 
   // Function to get status badge class based on status
   const getStatusBadgeClass = (status) => {
     switch (status) {
-      case "Validée":
-        return "status-validated";
-      case "Approuvée":
+      case "Brouillon":
+        return "status-draft";
+      case "Soumis":
+        return "status-submitted";
+      case "En cours d'examen":
+        return "status-review";
+      case "Approuvé":
         return "status-approved";
-      case "En traitement":
-        return "status-processing";
-      case "En livraison":
-        return "status-delivery";
-      case "Livrée":
-        return "status-delivered";
-      case "Rejetée":
+      case "Rejeté":
         return "status-rejected";
-      case "Active":
-        return "status-active";
-      case "Inactive":
-        return "status-inactive";
+      case "Commandé":
+        return "status-ordered";
+      case "Reçu":
+        return "status-received";
       default:
         return "";
     }
@@ -192,9 +127,25 @@ function Dashboard() {
                 <tr key={index}>
                   <td>{request.id}</td>
                   <td>{request.description}</td>
-                  <td>{request.type}</td>
-                  <td>{request.submissionDate}</td>
-                  <td>{request.validationDate}</td>
+
+                  {/* Type de marché */}
+                  <td>{request.marche_type || "—"}</td>
+
+                  {/* Date de soumission */}
+                  <td>
+                    {request.created_at
+                      ? new Date(request.created_at).toLocaleDateString()
+                      : "—"}
+                  </td>
+
+                  {/* Validation chef département : seulement si status_id === 4 */}
+                  <td>
+                    {request.status_id === 4 && request.updated_at
+                      ? new Date(request.updated_at).toLocaleDateString()
+                      : "—"}
+                  </td>
+
+                  {/* Statut */}
                   <td>
                     <span
                       className={`status-badge ${getStatusBadgeClass(

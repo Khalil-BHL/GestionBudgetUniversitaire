@@ -207,27 +207,17 @@ tbody td {
   display: inline-block;
 }
 
-.status-validated {
-  background-color: #e6f7ef;
-  color: #00a651;
+.status-submitted{
+  background-color: #faffe0;
+  color: #e6ff2a;
 }
 
-.status-approved {
-  background-color: #e0e0ff;
-  color: #5555ff;
-}
-
-.status-processing {
-  background-color: #e6f7ef;
-  color: #00a651;
-}
-
-.status-delivery {
+.status-review {
   background-color: #fff2e0;
   color: #ff9800;
 }
 
-.status-delivered {
+.status-approved {
   background-color: #e6f7ef;
   color: #00a651;
 }
@@ -237,15 +227,18 @@ tbody td {
   color: #ff4d4f;
 }
 
-.status-active {
-  background-color: #e6f7ef;
-  color: #00a651;
+.status-ordered{
+  background-color: #e0e0ff;
+  color: #5555ff;
 }
 
-.status-inactive {
-  background-color: #ffe0e0;
-  color: #ff4d4f;
+.status-received {
+  background-color: #b5b5b5;
+  color: #303231;
 }
+
+
+
 
 /* Pagination */
 .pagination {
