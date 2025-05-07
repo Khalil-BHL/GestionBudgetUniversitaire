@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
 import axios from "axios";
+import "font-awesome/css/font-awesome.min.css";
+import React, { useEffect, useState } from "react";
 import "./dashboard.css";
 
 function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState("Plus récent");
   const [stats, setStats] = useState([]);
   const [requests, setRequests] = useState([]);
 
@@ -13,7 +13,6 @@ function Dashboard() {
     axios
       .get("http://localhost:5000/api/dashboard")
       .then((res) => {
-        
         setStats(res.data.stats);
         setRequests(res.data.requests);
       })
@@ -55,7 +54,7 @@ function Dashboard() {
         {stats.map((stat, index) => (
           <div className="stat-card" key={index}>
             <div className="stat-icon" style={{ backgroundColor: stat.color }}>
-              <span>{stat.icon || "📊"}</span>
+              <i className={`fa ${stat.icon || "fa-chart-bar"}`}></i>{" "}
             </div>
             <div className="stat-info">
               <p className="stat-title">{stat.title}</p>
@@ -90,7 +89,7 @@ function Dashboard() {
           <h3>Les demandes</h3>
           <div className="requests-actions">
             <div className="search-container">
-              <span className="search-icon">🔍</span>
+              <i className="fa fa-search search-icon"></i>
               <input
                 type="text"
                 placeholder="Rechercher"
@@ -102,7 +101,7 @@ function Dashboard() {
               <span>Trier par: </span>
               <div className="sort-dropdown">
                 <button className="sort-button">
-                  {sortBy} <span>▼</span>
+                  Plus récent <span>▼</span>
                 </button>
               </div>
             </div>
@@ -152,6 +151,12 @@ function Dashboard() {
                         request.status
                       )}`}
                     >
+                      <i
+                        className={`fa fa-circle ${getStatusBadgeClass(
+                          request.status
+                        )}`}
+                      ></i>{" "}
+                      {/* Icône de statut */}
                       {request.status}
                     </span>
                   </td>
@@ -163,14 +168,18 @@ function Dashboard() {
 
         {/* Pagination */}
         <div className="pagination">
-          <button className="pagination-arrow">◀️</button>
+          <button className="pagination-arrow">
+            <i className="fa fa-arrow-left"></i>{" "}
+          </button>
           <button className="pagination-number active">1</button>
           <button className="pagination-number">2</button>
           <button className="pagination-number">3</button>
           <button className="pagination-number">4</button>
           <span className="pagination-dots">...</span>
           <button className="pagination-number">40</button>
-          <button className="pagination-arrow">▶️</button>
+          <button className="pagination-arrow">
+            <i className="fa fa-arrow-right"></i>{" "}
+          </button>
         </div>
       </div>
     </div>
