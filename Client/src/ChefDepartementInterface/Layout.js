@@ -30,9 +30,9 @@ function Layout() {
               </Link>
             </li>
             <li>
-              <Link to="/professor/request" className="nav-item">
-                <i className="fas fa-plus-circle icon"></i>
-                <span>Nouvelle demande</span>
+              <Link to="/professor/requests" className="nav-item">
+                <i className="fas fa-list icon"></i>
+                <span>Demandes des Professeurs</span>
               </Link>
             </li>
             <li>
