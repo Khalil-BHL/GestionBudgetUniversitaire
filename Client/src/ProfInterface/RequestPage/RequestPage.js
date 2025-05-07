@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Swal from 'sweetalert2';
+import React, { useState } from "react";
+import Swal from "sweetalert2";
 import "./request.css";
 
 function RequestPage() {
@@ -10,25 +10,14 @@ function RequestPage() {
     quantite: "",
     category: "",
   });
-  const [status, setStatus] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchStatus = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/api/type-marches");
-        setStatus(response.data.data);
-        setLoading(false);
-      } catch (err) {
-        setError("Erreur lors du chargement des types de marchés");
-        setLoading(false);
-        console.error("Error fetching type marches:", err);
-      }
-    };
-
-    fetchStatus();
-  }, []);
+  // ✅ Catégories fixées côté front-end
+  const categories = [
+    { id: 1, name: "Matériel informatique" },
+    { id: 2, name: "Fournitures de bureau" },
+    { id: 3, name: "Services de maintenance" },
+    { id: 4, name: "Équipement de laboratoire" },
+  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,46 +27,55 @@ function RequestPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log('Submitting request with data:', {
+      const requestData = {
         title: newRequest.title,
         description: newRequest.description,
         quantity: parseInt(newRequest.quantite),
-        type_marche_id: parseInt(newRequest.category)
-      });
+        type_marche_id: parseInt(newRequest.category),
+      };
 
-      const response = await axios.post("http://localhost:5000/api/purchase-requests", {
-        title: newRequest.title,
-        description: newRequest.description,
-        quantity: parseInt(newRequest.quantite),
-        type_marche_id: parseInt(newRequest.category)
-      });
+      const response = await axios.post(
+        "http://localhost:5000/api/purchase-requests",
+        requestData
+      );
 
-      if (response.data.status === 'success') {
+      if (response.data.status === "success") {
         Swal.fire({
           position: "top-end",
           icon: "success",
-          title: "Votre demande est bien enregistré",
+          title: "Votre demande est bien enregistrée",
           showConfirmButton: false,
-          timer: 1500
+          timer: 1500,
         });
-        setNewRequest({ title: "", description: "", quantite: "", category: "" });
+
+        setNewRequest({
+          title: "",
+          description: "",
+          quantite: "",
+          category: "",
+        });
       }
     } catch (err) {
-      console.error('Error submitting request:', err.response ? err.response.data : err.message);
+      console.error(
+        "Erreur lors de la soumission :",
+        err.response ? err.response.data : err.message
+      );
       Swal.fire({
         position: "top-end",
         icon: "error",
-        title: err.response?.data?.message || "Erreur lors de la soumission de la demande",
+        title:
+          err.response?.data?.message ||
+          "Erreur lors de la soumission de la demande",
         showConfirmButton: false,
-        timer: 1500
+        timer: 1500,
       });
     }
   };
 
   return (
     <div className="request-container">
-      <h1>Nouvelle Demande</h1>
-      <p>Formulaire de demande de budget</p>
+      <h1>Demande de Budget</h1>
+      <p>Remplissez les champs pour soumettre votre demande</p>
 
       <form className="request-form" onSubmit={handleSubmit}>
         <div className="form-group">
@@ -88,7 +86,7 @@ function RequestPage() {
             name="title"
             value={newRequest.title}
             onChange={handleChange}
-            placeholder="Titre de la demande"
+            placeholder="Ex: Achat PC"
             required
           />
         </div>
@@ -101,7 +99,7 @@ function RequestPage() {
             rows="4"
             value={newRequest.description}
             onChange={handleChange}
-            placeholder="Décrivez l'objet de la demande"
+            placeholder="Décrivez la demande"
             required
           ></textarea>
         </div>
@@ -127,17 +125,14 @@ function RequestPage() {
             value={newRequest.category}
             onChange={handleChange}
             required
-            disabled={loading}
           >
             <option value="">Sélectionnez une catégorie</option>
-            {status && status.map((item) => (
+            {categories.map((item) => (
               <option key={item.id} value={item.id}>
                 {item.name}
               </option>
             ))}
           </select>
-          {loading && <p>Chargement des catégories...</p>}
-          {error && <p className="error">{error}</p>}
         </div>
 
         <div className="form-actions">
