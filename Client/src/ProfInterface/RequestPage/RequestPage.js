@@ -1,49 +1,77 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import Swal from 'sweetalert2';
 import "./request.css";
 
 function RequestPage() {
-  const [requests, setRequests] = useState([]);
   const [newRequest, setNewRequest] = useState({
     title: "",
     description: "",
     quantite: "",
     category: "",
   });
+  const [status, setStatus] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/type-marches");
+        setStatus(response.data.data);
+        setLoading(false);
+      } catch (err) {
+        setError("Erreur lors du chargement des types de marchés");
+        setLoading(false);
+        console.error("Error fetching type marches:", err);
+      }
+    };
+
+    fetchStatus();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewRequest({ ...newRequest, [name]: value });
   };
 
-  const handleAddRequest = () => {
-    if (
-      newRequest.title.trim() &&
-      newRequest.description.trim() &&
-      newRequest.quantite.trim() &&
-      newRequest.category
-    ) {
-      setRequests([newRequest, ...requests]); // Ajouter la nouvelle demande à la liste
-      setNewRequest({ title: "", description: "", quantite: "", category: "" });
-    } else {
-      alert("Veuillez remplir tous les champs de la demande.");
-    }
-  };
-
-  const handleDeleteRequest = (index) => {
-    const newRequests = requests.filter((_, i) => i !== index); // Supprimer la demande
-    setRequests(newRequests);
-  };
-
-  const handleEditRequest = (index) => {
-    const requestToEdit = requests[index];
-    setNewRequest(requestToEdit); // Remplir les champs avec la demande à modifier
-    handleDeleteRequest(index); // Supprimer la demande de la liste
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Toutes les demandes soumises:", requests);
-    // Envoyer vers le backend ici
+    try {
+      console.log('Submitting request with data:', {
+        title: newRequest.title,
+        description: newRequest.description,
+        quantity: parseInt(newRequest.quantite),
+        type_marche_id: parseInt(newRequest.category)
+      });
+
+      const response = await axios.post("http://localhost:5000/api/purchase-requests", {
+        title: newRequest.title,
+        description: newRequest.description,
+        quantity: parseInt(newRequest.quantite),
+        type_marche_id: parseInt(newRequest.category)
+      });
+
+      if (response.data.status === 'success') {
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "Votre demande est bien enregistré",
+          showConfirmButton: false,
+          timer: 1500
+        });
+        setNewRequest({ title: "", description: "", quantite: "", category: "" });
+      }
+    } catch (err) {
+      console.error('Error submitting request:', err.response ? err.response.data : err.message);
+      Swal.fire({
+        position: "top-end",
+        icon: "error",
+        title: err.response?.data?.message || "Erreur lors de la soumission de la demande",
+        showConfirmButton: false,
+        timer: 1500
+      });
+    }
   };
 
   return (
@@ -99,61 +127,25 @@ function RequestPage() {
             value={newRequest.category}
             onChange={handleChange}
             required
+            disabled={loading}
           >
             <option value="">Sélectionnez une catégorie</option>
-            <option value="equipment">Équipement</option>
-            <option value="supplies">Fournitures</option>
-            <option value="travel">Déplacement</option>
-            <option value="other">Autre</option>
+            {status && status.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.name}
+              </option>
+            ))}
           </select>
+          {loading && <p>Chargement des catégories...</p>}
+          {error && <p className="error">{error}</p>}
         </div>
 
         <div className="form-actions">
-          <button
-            type="button"
-            onClick={handleAddRequest}
-            className="add-button"
-          >
-            + Ajouter une nouvelle demande
-          </button>
           <button type="submit" className="submit-button">
-            Soumettre toutes les demandes
+            Soumettre la demande
           </button>
         </div>
       </form>
-
-      {/* Liste des demandes*/}
-      <div className="requests-list">
-        {requests.length > 0 && (
-          <div className="added-requests">
-            {requests.map((req, index) => (
-              <div key={index} className="request-card">
-                <h3>{req.title || "Titre de la demande"}</h3>
-                <p>{req.description || "Description de la demande"}</p>
-                <p>Quantité: {req.quantite || "0"}</p>
-                <p>Catégorie: {req.category || "Non spécifiée"}</p>
-
-                <div className="request-actions">
-                  <button
-                    type="button"
-                    onClick={() => handleEditRequest(index)}
-                    className="edit-button"
-                  >
-                    Modifier
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteRequest(index)}
-                    className="delete-button"
-                  >
-                    Supprimer
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   );
 }

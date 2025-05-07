@@ -3,6 +3,8 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const authRoutes = require("./routes/authRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+const typeMarchesRoutes = require("./routes/typeMarchesRoutes");
+const purchaseRequestsRoutes = require("./routes/purchaseRequestsRoutes");
 
 
 // Load environment variables
@@ -17,6 +19,8 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/type-marches", typeMarchesRoutes);
+app.use("/api/purchase-requests", purchaseRequestsRoutes);
 
 // Health check route
 app.get("/", (req, res) => {

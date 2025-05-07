@@ -37,7 +37,7 @@ CREATE TABLE type_marches (
 );
 
 -- Create statuses table
-CREATE TABLE statuses (
+CREATE TABLE status (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     UNIQUE KEY (name)
@@ -48,6 +48,8 @@ CREATE TABLE purchase_requests (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     title VARCHAR(255) NOT NULL,
+    description TEXT,
+    quantity INT NOT NULL,
     status_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     type_marche_id INT,
