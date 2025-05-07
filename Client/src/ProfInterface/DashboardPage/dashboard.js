@@ -7,21 +7,38 @@ function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [stats, setStats] = useState([]);
   const [requests, setRequests] = useState([]);
+  const [filteredRequests, setFilteredRequests] = useState([]);
+  const [sortOrder, setSortOrder] = useState("desc"); // 'asc' or 'desc'
+  const [currentPage, setCurrentPage] = useState(1);
+  const requestsPerPage = 5;
 
-  // Fetch data from backend
+  // Fetch data once
   useEffect(() => {
     axios
       .get("http://localhost:5000/api/dashboard")
       .then((res) => {
         setStats(res.data.stats);
         setRequests(res.data.requests);
+        setFilteredRequests(res.data.requests);
       })
       .catch((err) => {
         console.error("Erreur lors de la récupération des données", err);
       });
   }, []);
 
-  // Function to get status badge class based on status
+  // Debounced search filter
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      const filtered = requests.filter((request) =>
+        request.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredRequests(filtered);
+      setCurrentPage(1);
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery, requests]);
+
   const getStatusBadgeClass = (status) => {
     switch (status) {
       case "Brouillon":
@@ -43,18 +60,30 @@ function Dashboard() {
     }
   };
 
+  const sortedRequests = [...filteredRequests].sort((a, b) => {
+    const dateA = new Date(a.created_at);
+    const dateB = new Date(b.created_at);
+    return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+  });
+
+  const totalPages = Math.ceil(sortedRequests.length / requestsPerPage);
+
+  const paginatedRequests = sortedRequests.slice(
+    (currentPage - 1) * requestsPerPage,
+    currentPage * requestsPerPage
+  );
+
   return (
     <div className="dashboard-content">
       <header className="dashboard-header">
         <h2>Bonjour 👋</h2>
       </header>
 
-      {/* Stats cards */}
       <div className="stats-container">
         {stats.map((stat, index) => (
           <div className="stat-card" key={index}>
             <div className="stat-icon" style={{ backgroundColor: stat.color }}>
-              <i className={`fa ${stat.icon || "fa-chart-bar"}`}></i>{" "}
+              <i className={`fa ${stat.icon || "fa-chart-bar"}`}></i>
             </div>
             <div className="stat-info">
               <p className="stat-title">{stat.title}</p>
@@ -65,7 +94,7 @@ function Dashboard() {
                     stat.change.startsWith("+") ? "positive" : "negative"
                   }`}
                 >
-                  {stat.change} this month
+                  {stat.change} ce mois
                 </p>
               )}
             </div>
@@ -83,7 +112,6 @@ function Dashboard() {
         ))}
       </div>
 
-      {/* Requests section */}
       <div className="requests-section">
         <div className="requests-header">
           <h3>Les demandes</h3>
@@ -100,15 +128,20 @@ function Dashboard() {
             <div className="sort-container">
               <span>Trier par: </span>
               <div className="sort-dropdown">
-                <button className="sort-button">
-                  Plus récent <span>▼</span>
+                <button
+                  className="sort-button"
+                  onClick={() =>
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                  }
+                >
+                  {sortOrder === "asc" ? "Plus ancien" : "Plus récent"}{" "}
+                  <span>▼</span>
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Requests table */}
         <div className="requests-table">
           <table>
             <thead>
@@ -122,29 +155,21 @@ function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {requests.map((request, index) => (
+              {paginatedRequests.map((request, index) => (
                 <tr key={index}>
                   <td>{request.id}</td>
                   <td>{request.description}</td>
-
-                  {/* Type de marché */}
                   <td>{request.marche_type || "—"}</td>
-
-                  {/* Date de soumission */}
                   <td>
                     {request.created_at
                       ? new Date(request.created_at).toLocaleDateString()
                       : "—"}
                   </td>
-
-                  {/* Validation chef département : seulement si status_id === 4 */}
                   <td>
                     {request.status_id === 4 && request.updated_at
                       ? new Date(request.updated_at).toLocaleDateString()
                       : "—"}
                   </td>
-
-                  {/* Statut */}
                   <td>
                     <span
                       className={`status-badge ${getStatusBadgeClass(
@@ -156,7 +181,6 @@ function Dashboard() {
                           request.status
                         )}`}
                       ></i>{" "}
-                      {/* Icône de statut */}
                       {request.status}
                     </span>
                   </td>
@@ -166,19 +190,35 @@ function Dashboard() {
           </table>
         </div>
 
-        {/* Pagination */}
         <div className="pagination">
-          <button className="pagination-arrow">
-            <i className="fa fa-arrow-left"></i>{" "}
+          <button
+            className="pagination-arrow"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            <i className="fa fa-arrow-left"></i>
           </button>
-          <button className="pagination-number active">1</button>
-          <button className="pagination-number">2</button>
-          <button className="pagination-number">3</button>
-          <button className="pagination-number">4</button>
-          <span className="pagination-dots">...</span>
-          <button className="pagination-number">40</button>
-          <button className="pagination-arrow">
-            <i className="fa fa-arrow-right"></i>{" "}
+
+          {[...Array(totalPages)].map((_, index) => (
+            <button
+              key={index}
+              className={`pagination-number ${
+                currentPage === index + 1 ? "active" : ""
+              }`}
+              onClick={() => setCurrentPage(index + 1)}
+            >
+              {index + 1}
+            </button>
+          ))}
+
+          <button
+            className="pagination-arrow"
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+          >
+            <i className="fa fa-arrow-right"></i>
           </button>
         </div>
       </div>

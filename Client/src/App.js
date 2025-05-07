@@ -4,6 +4,10 @@ import "./App.css";
 
 import Login from "./LoginPage/login";
 
+// chef de departement components
+import ChefDepartementDashboard from "./ChefdepInterface/ChefDepartementDashboard";
+import ChefDepartementLayout from "./ChefdepInterface/ChefDepartementLayout";
+
 // Professor components
 import ProfDashboard from "./ProfInterface/DashboardPage/dashboard";
 import ProfLayout from "./ProfInterface/Layout";
@@ -13,6 +17,7 @@ import RequestPage from "./ProfInterface/RequestPage/RequestPage";
 const ComptableDashboard = () => (
   <div>Comptable Dashboard (To be implemented)</div>
 );
+
 const ComptableLayout = ({ children }) => (
   <div className="dashboard-container">{children}</div>
 );
@@ -20,14 +25,8 @@ const ComptableLayout = ({ children }) => (
 const DirectionDashboard = () => (
   <div>Direction Dashboard (To be implemented)</div>
 );
-const DirectionLayout = ({ children }) => (
-  <div className="dashboard-container">{children}</div>
-);
 
-const ChefDepartementDashboard = () => (
-  <div>Chef Departement Dashboard (To be implemented)</div>
-);
-const ChefDepartementLayout = ({ children }) => (
+const DirectionLayout = ({ children }) => (
   <div className="dashboard-container">{children}</div>
 );
 
