@@ -1,9 +1,16 @@
-import React from "react";
-import { Link, Outlet } from "react-router-dom";
-import "./Layout.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import React from "react";
+import { Link, Outlet, useNavigate } from "react-router-dom";
+import "./Layout.css";
 
 function Layout() {
+  const navigate = useNavigate(); // Utilisation de useNavigate pour la redirection
+
+  const handleLogout = () => {
+    // Rediriger vers la page de login
+    navigate("/"); // Redirection vers la page de login
+  };
+
   return (
     <div className="dashboard-container">
       {/* Sidebar */}
@@ -36,7 +43,7 @@ function Layout() {
             </li>
           </ul>
         </nav>
-        <button className="logout-button">
+        <button className="logout-button" onClick={handleLogout}>
           <i className="fas fa-sign-out-alt icon"></i> Déconnexion
         </button>
       </div>
