@@ -1,35 +1,65 @@
 import axios from "axios";
 import "font-awesome/css/font-awesome.min.css";
 import React, { useEffect, useState } from "react";
-import "./dashboard.css";
+import { Link } from "react-router-dom";
+import "./requestsList.css";
 
-function Dashboard() {
+function RequestsList() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [stats, setStats] = useState([]);
   const [requests, setRequests] = useState([]);
   const [filteredRequests, setFilteredRequests] = useState([]);
-  const [sortOrder, setSortOrder] = useState("desc");
+  const [sortOrder, setSortOrder] = useState("desc"); // 'asc' or 'desc'
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedRequest, setSelectedRequest] = useState(null);
-  const requestsPerPage = 5;
+  const requestsPerPage = 10;
 
+  // Fetch data once
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/dashboard")
+      .get("http://localhost:5000/api/requests/pending")
       .then((res) => {
-        setStats(res.data.stats);
-        setRequests(res.data.requests);
-        setFilteredRequests(res.data.requests);
+        setRequests(res.data.requests || []);
+        setFilteredRequests(res.data.requests || []);
       })
       .catch((err) => {
         console.error("Erreur lors de la récupération des données", err);
+        // Use sample data for demonstration
+        const sampleData = [
+          {
+            id: "REQ-2024-0042",
+            title: "Achat PC",
+            description: "Acquisition de 4 ordinateurs portables",
+            status: "Soumis",
+            created_at: "2024-04-23T14:30:00",
+            professor: "Prof. Mohammed Alami"
+          },
+          {
+            id: "REQ-2024-0043",
+            title: "Fournitures de bureau",
+            description: "Papier, stylos et classeurs",
+            status: "Soumis",
+            created_at: "2024-04-22T10:15:00",
+            professor: "Prof. Fatima Zahra"
+          },
+          {
+            id: "REQ-2024-0044",
+            title: "Équipement de laboratoire",
+            description: "Microscopes et verrerie",
+            status: "Soumis",
+            created_at: "2024-04-21T09:45:00",
+            professor: "Prof. Ahmed Bennani"
+          }
+        ];
+        setRequests(sampleData);
+        setFilteredRequests(sampleData);
       });
   }, []);
 
+  // Debounced search filter
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       const filtered = requests.filter((request) =>
-        request.description.toLowerCase().includes(searchQuery.toLowerCase())
+        request.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        request.title.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredRequests(filtered);
       setCurrentPage(1);
@@ -40,8 +70,6 @@ function Dashboard() {
 
   const getStatusBadgeClass = (status) => {
     switch (status) {
-      case "Brouillon":
-        return "status-draft";
       case "Soumis":
         return "status-submitted";
       case "En cours d'examen":
@@ -50,10 +78,6 @@ function Dashboard() {
         return "status-approved";
       case "Rejeté":
         return "status-rejected";
-      case "Commandé":
-        return "status-ordered";
-      case "Reçu":
-        return "status-received";
       default:
         return "";
     }
@@ -73,47 +97,14 @@ function Dashboard() {
   );
 
   return (
-    <div className="dashboard-content">
-      <header className="dashboard-header">
-        <h2>Bonjour 👋</h2>
+    <div className="requests-list-content">
+      <header className="requests-list-header">
+        <h2>Demandes à Valider</h2>
       </header>
-
-      <div className="stats-container">
-        {stats.map((stat, index) => (
-          <div className="stat-card" key={index}>
-            <div className="stat-icon" style={{ backgroundColor: stat.color }}>
-              <i className={`fa ${stat.icon || "fa-chart-bar"}`}></i>
-            </div>
-            <div className="stat-info">
-              <p className="stat-title">{stat.title}</p>
-              <h3 className="stat-value">{stat.value}</h3>
-              {stat.change && (
-                <p
-                  className={`stat-change ${
-                    stat.change.startsWith("+") ? "positive" : "negative"
-                  }`}
-                >
-                  {stat.change} ce mois
-                </p>
-              )}
-            </div>
-            {index === 2 && (
-              <div className="active-users">
-                <div className="user-avatars">
-                  <span className="avatar">👤</span>
-                  <span className="avatar">👤</span>
-                  <span className="avatar">👤</span>
-                  <span className="avatar">👤</span>
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
 
       <div className="requests-section">
         <div className="requests-header">
-          <h3>Les demandes</h3>
+          <h3>Liste des demandes</h3>
           <div className="requests-actions">
             <div className="search-container">
               <i className="fa fa-search search-icon"></i>
@@ -147,30 +138,23 @@ function Dashboard() {
               <tr>
                 <th>ID Demande</th>
                 <th>Titre</th>
-                <th>Type de Marché</th>
+                <th>Description</th>
+                <th>Professeur</th>
                 <th>Date de Soumission</th>
-                <th>Date de Validation</th>
                 <th>État</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {paginatedRequests.map((request, index) => (
-                <tr
-                  key={index}
-                  className="clickable-row"
-                  onClick={() => setSelectedRequest(request)}
-                >
+                <tr key={index}>
                   <td>{request.id}</td>
                   <td>{request.title}</td>
-                  <td>{request.marche_type || "—"}</td>
+                  <td>{request.description}</td>
+                  <td>{request.professor}</td>
                   <td>
                     {request.created_at
                       ? new Date(request.created_at).toLocaleDateString()
-                      : "—"}
-                  </td>
-                  <td>
-                    {request.status_id === 4 && request.updated_at
-                      ? new Date(request.updated_at).toLocaleDateString()
                       : "—"}
                   </td>
                   <td>
@@ -186,6 +170,11 @@ function Dashboard() {
                       ></i>{" "}
                       {request.status}
                     </span>
+                  </td>
+                  <td>
+                    <Link to={`/chef-departement/request/${request.id}`} className="view-button">
+                      Examiner
+                    </Link>
                   </td>
                 </tr>
               ))}
@@ -225,40 +214,8 @@ function Dashboard() {
           </button>
         </div>
       </div>
-
-      {/* Modal pour afficher la description de la demande */}
-      {selectedRequest && (
-        <div className="modal-overlay" onClick={() => setSelectedRequest(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h4>Détails de la demande</h4>
-            <p>
-              <strong>ID :</strong> {selectedRequest.id}
-            </p>
-            <p>
-              <strong>Description :</strong> {selectedRequest.description}
-            </p>
-            <p>
-              <strong>Type de Marché :</strong>{" "}
-              {selectedRequest.marche_type || "—"}
-            </p>
-            <p>
-              <strong>Date de Soumission :</strong>{" "}
-              {new Date(selectedRequest.created_at).toLocaleDateString()}
-            </p>
-            <p>
-              <strong>État :</strong> {selectedRequest.status}
-            </p>
-            <button
-              className="close-button"
-              onClick={() => setSelectedRequest(null)}
-            >
-              Fermer
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
 
-export default Dashboard;
+export default RequestsList;

@@ -5,12 +5,11 @@ function RequestPage() {
   const [requests, setRequests] = useState([]);
 
   useEffect(() => {
-    // Appel API pour récupérer les demandes des professeurs depuis le bon endpoint
     axios
-      .get("http://localhost:3000/professor/dashboard") // Remplace l'ancienne URL par celle-ci
+      .get("http://localhost:3000/professor/dashboard")
       .then((res) => {
         setRequests(res.data);
-        console.log("Données récupérées:", res.data); // Affiche les données pour vérification
+        console.log("Données récupérées:", res.data);
       })
       .catch((err) => {
         console.error(

@@ -5,7 +5,12 @@ const db = require("../config/db");
 // GET /api/dashboard
 router.get("/", async (req, res) => {
   try {
-    const [requests] = await db.query(`
+    // Get user info from request (assuming it's set by auth middleware)
+    const userId = req.query.userId;
+    const userRole = req.query.userRole;
+
+    // Base query
+    let query = `
       SELECT 
         pr.id,
         pr.title,
@@ -14,13 +19,32 @@ router.get("/", async (req, res) => {
         pr.updated_at,
         s.name AS status,
         s.id AS status_id,         
-        tm.name AS marche_type
-        FROM purchase_requests pr
-        LEFT JOIN status s ON pr.status_id = s.id
-        LEFT JOIN type_marches tm ON pr.type_marche_id = tm.id
-        ORDER BY pr.created_at DESC;
+        tm.name AS marche_type,
+        u.department_id,
+        d.name as department_name
+      FROM purchase_requests pr
+      LEFT JOIN status s ON pr.status_id = s.id
+      LEFT JOIN type_marches tm ON pr.type_marche_id = tm.id
+      LEFT JOIN users u ON pr.user_id = u.id
+      LEFT JOIN departments d ON u.department_id = d.id
+    `;
 
-    `);
+    // If user is chef departement, filter by their department
+    if (userRole === 'chef_departement' || userRole === 'Chef Departement') {
+      // First get the chef's department
+      const [chefDept] = await db.query(
+        'SELECT department_id FROM users WHERE id = ?',
+        [userId]
+      );
+      
+      if (chefDept.length > 0) {
+        query += ` WHERE u.department_id = ${chefDept[0].department_id}`;
+      }
+    }
+
+    query += ` ORDER BY pr.created_at DESC`;
+
+    const [requests] = await db.query(query);
 
     // Compute some statistics
     const total = requests.length;
