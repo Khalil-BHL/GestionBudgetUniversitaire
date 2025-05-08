@@ -1,14 +1,14 @@
-import "@fortawesome/fontawesome-free/css/all.min.css";
-import React from "react";
-import { Link, Outlet, useNavigate } from "react-router-dom";
-import "./Layout.css";
+import React from 'react';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { MdDashboard, MdList, MdNotifications, MdLogout } from 'react-icons/md';
+import './Layout.css';
 
 function Layout() {
-  const navigate = useNavigate(); // Utilisation de useNavigate pour la redirection
-
+  const navigate = useNavigate(); // Add useNavigate hook
+  
   const handleLogout = () => {
-    // Rediriger vers la page de login
-    navigate("/"); // Redirection vers la page de login
+    // Redirect to login page
+    navigate("/");
   };
 
   return (
@@ -16,39 +16,37 @@ function Layout() {
       {/* Sidebar */}
       <div className="sidebar">
         <div className="logo">
-          <h1>
-            <span className="uni-part">UNI</span>
-            <span className="budget-part">BUDGET</span>
-          </h1>
+          <h1><span className="uni-part">UNI</span><span className="budget-part">BUDGET</span></h1>
         </div>
         <nav className="sidebar-nav">
           <ul>
             <li>
-              <Link to="/professor/dashboard" className="nav-item">
-                <i className="fas fa-chart-line icon"></i>
+              <Link to="/chef-departement/dashboard" className="nav-item">
+                <span className="icon"><MdDashboard /></span>
                 <span>Tableau de bord</span>
               </Link>
             </li>
             <li>
-              <Link to="/professor/requests" className="nav-item">
-                <i className="fas fa-list icon"></i>
-                <span>Demandes des Professeurs</span>
+              <Link to="/chef-departement/requests" className="nav-item">
+                <span className="icon"><MdList /></span>
+                <span>Demandes à valider</span>
               </Link>
             </li>
             <li>
               <div className="nav-item">
-                <i className="fas fa-bell icon"></i>
+                <span className="icon"><MdNotifications /></span>
                 <span>Notifications</span>
               </div>
             </li>
           </ul>
         </nav>
         <button className="logout-button" onClick={handleLogout}>
-          <i className="fas fa-sign-out-alt icon"></i> Déconnexion
+          <MdLogout style={{ marginRight: '8px' }} />
+          Déconnexion
         </button>
       </div>
-
-      {/* Main content */}
+      
+      {/* Main content - will be replaced by the current route */}
       <div className="main-content">
         <Outlet />
       </div>
