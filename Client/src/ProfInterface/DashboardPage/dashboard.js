@@ -146,10 +146,10 @@ function Dashboard() {
             <thead>
               <tr>
                 <th>ID Demande</th>
-                <th>Description</th>
+                <th>Titre</th>
                 <th>Type de Marché</th>
                 <th>Date de Soumission</th>
-                <th>Validation Chef Département</th>
+                <th>Date de Validation</th>
                 <th>État</th>
               </tr>
             </thead>
@@ -161,7 +161,7 @@ function Dashboard() {
                   onClick={() => setSelectedRequest(request)}
                 >
                   <td>{request.id}</td>
-                  <td>{request.description}</td>
+                  <td>{request.title}</td>
                   <td>{request.marche_type || "—"}</td>
                   <td>
                     {request.created_at

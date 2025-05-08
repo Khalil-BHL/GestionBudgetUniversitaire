@@ -4,9 +4,14 @@ const createPurchaseRequest = async (req, res) => {
   try {
     console.log("Received request body:", req.body);
     const { title, description, quantity, type_marche_id } = req.body;
+    const user_id = req.body.user_id; // Get user_id from request body
 
-    // Temporarily set a default user_id for testing
-    const user_id = 1; // This should be replaced with actual user authentication later
+    if (!user_id) {
+      return res.status(400).json({
+        status: "error",
+        message: "User ID is required",
+      });
+    }
 
     if (!title || !description || !quantity || !type_marche_id) {
       return res.status(400).json({

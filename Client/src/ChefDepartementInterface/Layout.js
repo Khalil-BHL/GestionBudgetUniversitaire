@@ -4,11 +4,11 @@ import { Link, Outlet, useNavigate } from "react-router-dom";
 import "./Layout.css";
 
 function Layout() {
-  const navigate = useNavigate(); // Utilisation de useNavigate pour la redirection
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Rediriger vers la page de login
-    navigate("/"); // Redirection vers la page de login
+    localStorage.removeItem("user");
+    navigate("/");
   };
 
   return (
@@ -24,13 +24,13 @@ function Layout() {
         <nav className="sidebar-nav">
           <ul>
             <li>
-              <Link to="/professor/dashboard" className="nav-item">
+              <Link to="/chef-departement/dashboard" className="nav-item">
                 <i className="fas fa-chart-line icon"></i>
                 <span>Tableau de bord</span>
               </Link>
             </li>
             <li>
-              <Link to="/professor/requests" className="nav-item">
+              <Link to="/chef-departement/requests" className="nav-item">
                 <i className="fas fa-list icon"></i>
                 <span>Demandes des Professeurs</span>
               </Link>

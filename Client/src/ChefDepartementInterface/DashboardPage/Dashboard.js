@@ -10,12 +10,21 @@ function Dashboard() {
   const [filteredRequests, setFilteredRequests] = useState([]);
   const [sortOrder, setSortOrder] = useState("desc"); // 'asc' or 'desc'
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedRequest, setSelectedRequest] = useState(null);
   const requestsPerPage = 5;
 
   // Fetch data once
   useEffect(() => {
+    // Get user info from localStorage
+    const user = JSON.parse(localStorage.getItem("user"));
+    
     axios
-      .get("http://localhost:5000/api/dashboard")
+      .get("http://localhost:5000/api/dashboard", {
+        params: {
+          userId: user.id,
+          userRole: user.role
+        }
+      })
       .then((res) => {
         setStats(res.data.stats);
         setRequests(res.data.requests);
@@ -147,18 +156,22 @@ function Dashboard() {
             <thead>
               <tr>
                 <th>ID Demande</th>
-                <th>Description</th>
+                <th>Titre</th>
                 <th>Type de Marché</th>
                 <th>Date de Soumission</th>
-                <th>Validation Chef Département</th>
+                <th>Date de Validation</th>
                 <th>État</th>
               </tr>
             </thead>
             <tbody>
               {paginatedRequests.map((request, index) => (
-                <tr key={index}>
+                <tr 
+                  key={index}
+                  className="clickable-row"
+                  onClick={() => setSelectedRequest(request)}
+                >
                   <td>{request.id}</td>
-                  <td>{request.description}</td>
+                  <td>{request.title}</td>
                   <td>{request.marche_type || "—"}</td>
                   <td>
                     {request.created_at
@@ -222,6 +235,44 @@ function Dashboard() {
           </button>
         </div>
       </div>
+
+      {/* Modal pour afficher la description de la demande */}
+      {selectedRequest && (
+        <div className="modal-overlay" onClick={() => setSelectedRequest(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h4>Détails de la demande</h4>
+            <p>
+              <strong>ID :</strong> {selectedRequest.id}
+            </p>
+            <p>
+              <strong>Titre :</strong> {selectedRequest.title}
+            </p>
+            <p>
+              <strong>Description :</strong> {selectedRequest.description}
+            </p>
+            <p>
+              <strong>Type de Marché :</strong>{" "}
+              {selectedRequest.marche_type || "—"}
+            </p>
+            <p>
+              <strong>Date de Soumission :</strong>{" "}
+              {new Date(selectedRequest.created_at).toLocaleDateString()}
+            </p>
+            <p>
+              <strong>État :</strong> {selectedRequest.status}
+            </p>
+            <p>
+              <strong>Département :</strong> {selectedRequest.department_name || "—"}
+            </p>
+            <button
+              className="close-button"
+              onClick={() => setSelectedRequest(null)}
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
