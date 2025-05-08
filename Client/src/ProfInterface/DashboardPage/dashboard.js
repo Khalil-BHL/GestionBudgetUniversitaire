@@ -8,11 +8,11 @@ function Dashboard() {
   const [stats, setStats] = useState([]);
   const [requests, setRequests] = useState([]);
   const [filteredRequests, setFilteredRequests] = useState([]);
-  const [sortOrder, setSortOrder] = useState("desc"); // 'asc' or 'desc'
+  const [sortOrder, setSortOrder] = useState("desc");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedRequest, setSelectedRequest] = useState(null);
   const requestsPerPage = 5;
 
-  // Fetch data once
   useEffect(() => {
     axios
       .get("http://localhost:5000/api/dashboard")
@@ -26,7 +26,6 @@ function Dashboard() {
       });
   }, []);
 
-  // Debounced search filter
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       const filtered = requests.filter((request) =>
@@ -156,7 +155,11 @@ function Dashboard() {
             </thead>
             <tbody>
               {paginatedRequests.map((request, index) => (
-                <tr key={index}>
+                <tr
+                  key={index}
+                  className="clickable-row"
+                  onClick={() => setSelectedRequest(request)}
+                >
                   <td>{request.id}</td>
                   <td>{request.description}</td>
                   <td>{request.marche_type || "—"}</td>
@@ -222,6 +225,38 @@ function Dashboard() {
           </button>
         </div>
       </div>
+
+      {/* Modal pour afficher la description de la demande */}
+      {selectedRequest && (
+        <div className="modal-overlay" onClick={() => setSelectedRequest(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h4>Détails de la demande</h4>
+            <p>
+              <strong>ID :</strong> {selectedRequest.id}
+            </p>
+            <p>
+              <strong>Description :</strong> {selectedRequest.description}
+            </p>
+            <p>
+              <strong>Type de Marché :</strong>{" "}
+              {selectedRequest.marche_type || "—"}
+            </p>
+            <p>
+              <strong>Date de Soumission :</strong>{" "}
+              {new Date(selectedRequest.created_at).toLocaleDateString()}
+            </p>
+            <p>
+              <strong>État :</strong> {selectedRequest.status}
+            </p>
+            <button
+              className="close-button"
+              onClick={() => setSelectedRequest(null)}
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
