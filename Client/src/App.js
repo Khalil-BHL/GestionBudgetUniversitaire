@@ -7,6 +7,8 @@ import Login from "./LoginPage/login";
 // Chef Departement components
 import ChefDepartementDashboard from "./ChefDepartementInterface/DashboardPage/Dashboard";
 import ChefDepartementLayout from "./ChefDepartementInterface/Layout";
+import RequestsList from "./ChefDepartementInterface/RequestsListPage/RequestsList";
+import ChefRequestPage from "./ChefDepartementInterface/RequestPage/RequestPage";
 
 // Professor components
 import ProfDashboard from "./ProfInterface/DashboardPage/dashboard";
@@ -53,6 +55,8 @@ function App() {
         {/* Chef Departement routes */}
         <Route path="/chef-departement" element={<ChefDepartementLayout />}>
           <Route path="dashboard" element={<ChefDepartementDashboard />} />
+          <Route path="requests" element={<RequestsList />} />
+          <Route path="request/:id" element={<ChefRequestPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

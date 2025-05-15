@@ -17,6 +17,8 @@ router.get("/", async (req, res) => {
         pr.description,
         pr.created_at,
         pr.updated_at,
+        pr.motif,
+        pr.user_id,
         s.name AS status,
         s.id AS status_id,         
         tm.name AS marche_type,
@@ -38,8 +40,16 @@ router.get("/", async (req, res) => {
       );
       
       if (chefDept.length > 0) {
-        query += ` WHERE u.department_id = ${chefDept[0].department_id}`;
+        // Check if this is the requests list page (status_id = 1) or dashboard (status_id > 1)
+        const statusCondition = req.query.status === 'pending' ? 'pr.status_id = 1' : 'pr.status_id > 1';
+        query += ` WHERE u.department_id = ${chefDept[0].department_id} AND ${statusCondition}`;
+      } else {
+        // If chef has no department, return empty array
+        return res.json({ stats: [], requests: [] });
       }
+    } else if (userRole === 'Prof') {
+      // Filter requests for the logged-in professor
+      query += ` WHERE pr.user_id = ${userId}`;
     }
 
     query += ` ORDER BY pr.created_at DESC`;
@@ -78,6 +88,59 @@ router.get("/", async (req, res) => {
   } catch (err) {
     console.error("Dashboard route error:", err);
     res.status(500).json({ error: "Failed to fetch dashboard data." });
+  }
+});
+
+// POST /api/dashboard/validate-request
+router.post("/validate-request", async (req, res) => {
+  try {
+    const { requestId, decision, comment, rejectionReason } = req.body;
+    
+    if (decision === 'approved') {
+      // Get the status ID for "En cours d'examen"
+      const [statusResult] = await db.query(
+        "SELECT id FROM status WHERE name = ?",
+        ["En cours d'examen"]
+      );
+
+      if (statusResult.length === 0) {
+        return res.status(404).json({ error: "Status not found" });
+      }
+
+      const statusId = statusResult[0].id;
+
+      // Update request status to "En cours d'examen" and store optional comment
+      await db.query(
+        "UPDATE purchase_requests SET status_id = ?, motif = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+        [statusId, comment || null, requestId]
+      );
+    } else if (decision === 'rejected') {
+      // Get the status ID for "Rejeté"
+      const [statusResult] = await db.query(
+        "SELECT id FROM status WHERE name = ?",
+        ["Rejeté"]
+      );
+
+      if (statusResult.length === 0) {
+        return res.status(404).json({ error: "Status not found" });
+      }
+
+      const statusId = statusResult[0].id;
+
+      // Update request status to "Rejeté" and add rejection reason
+      await db.query(
+        "UPDATE purchase_requests SET status_id = ?, motif = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+        [statusId, rejectionReason, requestId]
+      );
+    }
+
+    res.json({ 
+      status: "success",
+      message: decision === 'approved' ? "Request approved" : "Request rejected"
+    });
+  } catch (err) {
+    console.error("Error validating request:", err);
+    res.status(500).json({ error: "Failed to validate request" });
   }
 });
 

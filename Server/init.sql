@@ -51,6 +51,7 @@ CREATE TABLE purchase_requests (
     description TEXT,
     quantity INT NOT NULL,
     status_id INT,
+    motif TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     type_marche_id INT,
     FOREIGN KEY (user_id) REFERENCES users(id),

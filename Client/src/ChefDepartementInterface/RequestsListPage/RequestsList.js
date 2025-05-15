@@ -14,43 +14,38 @@ function RequestsList() {
 
   // Fetch data once
   useEffect(() => {
+    // Get user info from localStorage
+    const user = JSON.parse(localStorage.getItem("user"));
+    
+    // Check if user is logged in
+    if (!user) {
+      console.error("Utilisateur non connecté");
+      window.location.href = "/";
+      return;
+    }
+
+    // Verify user role
+    if (user.role !== 'Chef Departement') {
+      console.error("Accès non autorisé");
+      window.location.href = "/";
+      return;
+    }
+
     axios
-      .get("http://localhost:5000/api/requests/pending")
+      .get("http://localhost:5000/api/dashboard", {
+        params: {
+          userId: user.id,
+          userRole: user.role,
+          status: 'pending'
+        }
+      })
       .then((res) => {
-        setRequests(res.data.requests || []);
-        setFilteredRequests(res.data.requests || []);
+        // Les demandes sont déjà filtrées côté serveur
+        setRequests(res.data.requests);
+        setFilteredRequests(res.data.requests);
       })
       .catch((err) => {
         console.error("Erreur lors de la récupération des données", err);
-        // Use sample data for demonstration
-        const sampleData = [
-          {
-            id: "REQ-2024-0042",
-            title: "Achat PC",
-            description: "Acquisition de 4 ordinateurs portables",
-            status: "Soumis",
-            created_at: "2024-04-23T14:30:00",
-            professor: "Prof. Mohammed Alami"
-          },
-          {
-            id: "REQ-2024-0043",
-            title: "Fournitures de bureau",
-            description: "Papier, stylos et classeurs",
-            status: "Soumis",
-            created_at: "2024-04-22T10:15:00",
-            professor: "Prof. Fatima Zahra"
-          },
-          {
-            id: "REQ-2024-0044",
-            title: "Équipement de laboratoire",
-            description: "Microscopes et verrerie",
-            status: "Soumis",
-            created_at: "2024-04-21T09:45:00",
-            professor: "Prof. Ahmed Bennani"
-          }
-        ];
-        setRequests(sampleData);
-        setFilteredRequests(sampleData);
       });
   }, []);
 
@@ -139,7 +134,7 @@ function RequestsList() {
                 <th>ID Demande</th>
                 <th>Titre</th>
                 <th>Description</th>
-                <th>Professeur</th>
+                <th>Type de Marché</th>
                 <th>Date de Soumission</th>
                 <th>État</th>
                 <th>Actions</th>
@@ -151,7 +146,7 @@ function RequestsList() {
                   <td>{request.id}</td>
                   <td>{request.title}</td>
                   <td>{request.description}</td>
-                  <td>{request.professor}</td>
+                  <td>{request.marche_type || "—"}</td>
                   <td>
                     {request.created_at
                       ? new Date(request.created_at).toLocaleDateString()

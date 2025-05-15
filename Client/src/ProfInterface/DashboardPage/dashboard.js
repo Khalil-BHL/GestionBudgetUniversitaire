@@ -14,12 +14,39 @@ function Dashboard() {
   const requestsPerPage = 5;
 
   useEffect(() => {
+    // Get user info from localStorage
+    const user = JSON.parse(localStorage.getItem("user"));
+    
+    // Check if user is logged in
+    if (!user) {
+      console.error("Utilisateur non connecté");
+      // Optionally redirect to login page
+      window.location.href = "/";
+      return;
+    }
+
+    // Verify user role
+    if (user.role !== 'Prof') {
+      console.error("Accès non autorisé");
+      window.location.href = "/";
+      return;
+    }
+    
     axios
-      .get("http://localhost:5000/api/dashboard")
+      .get("http://localhost:5000/api/dashboard", {
+        params: {
+          userId: user.id,
+          userRole: user.role
+        }
+      })
       .then((res) => {
+        // Filter requests for the logged-in professor
+        const professorRequests = res.data.requests.filter(
+          request => request.user_id === user.id
+        );
         setStats(res.data.stats);
-        setRequests(res.data.requests);
-        setFilteredRequests(res.data.requests);
+        setRequests(professorRequests);
+        setFilteredRequests(professorRequests);
       })
       .catch((err) => {
         console.error("Erreur lors de la récupération des données", err);
@@ -169,7 +196,7 @@ function Dashboard() {
                       : "—"}
                   </td>
                   <td>
-                    {request.status_id === 4 && request.updated_at
+                    {request.status_id > 1 && request.updated_at
                       ? new Date(request.updated_at).toLocaleDateString()
                       : "—"}
                   </td>
@@ -248,6 +275,11 @@ function Dashboard() {
             <p>
               <strong>État :</strong> {selectedRequest.status}
             </p>
+            {selectedRequest.motif && (
+              <p>
+                <strong>Motif :</strong> {selectedRequest.motif}
+              </p>
+            )}
             <button
               className="close-button"
               onClick={() => setSelectedRequest(null)}
