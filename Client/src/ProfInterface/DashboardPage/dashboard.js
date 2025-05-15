@@ -1,6 +1,6 @@
 import axios from "axios";
 import "font-awesome/css/font-awesome.min.css";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./dashboard.css";
 
 function Dashboard() {
@@ -55,9 +55,23 @@ function Dashboard() {
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
-      const filtered = requests.filter((request) =>
-        request.description.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      const filtered = requests.filter((request) => {
+        const valuesToSearch = [
+          request.id?.toString(),
+          request.title,
+          request.description,
+          request.type_marche_id,
+          request.quantity,
+          request.status,
+          request.created_at,
+          request.updated_at,
+        ];
+
+        return valuesToSearch.some((value) =>
+          value?.toString().toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      });
+
       setFilteredRequests(filtered);
       setCurrentPage(1);
     }, 300);
@@ -253,7 +267,6 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Modal pour afficher la description de la demande */}
       {selectedRequest && (
         <div className="modal-overlay" onClick={() => setSelectedRequest(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
