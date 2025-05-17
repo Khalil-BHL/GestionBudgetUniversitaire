@@ -417,3 +417,38 @@
     background-color: #fff1f0;
     border-radius: 4px;
   }
+
+  .loading-message,
+  .error-message {
+    text-align: center;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  }
+
+  .loading-message h2,
+  .error-message h2 {
+    color: #333;
+    margin-bottom: 1rem;
+  }
+
+  .loading-message p,
+  .error-message p {
+    color: #666;
+    margin-bottom: 1.5rem;
+  }
+
+  .error-message button {
+    padding: 0.5rem 1rem;
+    background-color: #5555ff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  .error-message button:hover {
+    background-color: #4444cc;
+  }

@@ -1,37 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './RequestPage.css';
 import { MdPerson, MdCategory, MdDescription, MdAttachMoney, MdThumbUp, MdThumbDown } from 'react-icons/md';
 
 function RequestPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [request, setRequest] = useState(null);
   const [decision, setDecision] = useState('');
   const [comment, setComment] = useState('');
   const [rejectionReason, setRejectionReason] = useState('');
   const [showRejectionInput, setShowRejectionInput] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     // Get user info from localStorage
     const user = JSON.parse(localStorage.getItem("user"));
     
-    axios.get(`http://localhost:5000/api/dashboard`, {
+    if (!user) {
+      navigate('/');
+      return;
+    }
+
+    // Fetch specific request
+    axios.get(`http://localhost:5000/api/dashboard/request/${id}`, {
       params: {
         userId: user.id,
         userRole: user.role
       }
     })
     .then(res => {
-      const foundRequest = res.data.requests.find(r => r.id === parseInt(id));
-      if (foundRequest) {
-        setRequest(foundRequest);
+      if (res.data.request) {
+        setRequest(res.data.request);
+      } else {
+        setError("Demande non trouvée");
       }
     })
     .catch(err => {
       console.error("Erreur lors de la récupération des données", err);
+      setError("Une erreur est survenue lors du chargement de la demande");
     });
-  }, [id]);
+  }, [id, navigate]);
 
   const handleApprove = async () => {
     try {
@@ -73,8 +83,29 @@ function RequestPage() {
     }
   };
 
+  if (error) {
+    return (
+      <div className="request-preview-container">
+        <div className="error-message">
+          <h2>Erreur</h2>
+          <p>{error}</p>
+          <button onClick={() => navigate('/chef-departement/requests')}>
+            Retour à la liste
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (!request) {
-    return <div>Chargement...</div>;
+    return (
+      <div className="request-preview-container">
+        <div className="loading-message">
+          <h2>Chargement...</h2>
+          <p>Veuillez patienter pendant le chargement de la demande.</p>
+        </div>
+      </div>
+    );
   }
 
   return (

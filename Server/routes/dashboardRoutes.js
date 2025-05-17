@@ -91,6 +91,67 @@ router.get("/", async (req, res) => {
   }
 });
 
+// GET /api/dashboard/request/:id
+router.get("/request/:id", async (req, res) => {
+  try {
+    const requestId = req.params.id;
+    const userId = req.query.userId;
+    const userRole = req.query.userRole;
+
+    // Base query for single request
+    let query = `
+      SELECT 
+        pr.id,
+        pr.title,
+        pr.description,
+        pr.created_at,
+        pr.updated_at,
+        pr.motif,
+        pr.user_id,
+        s.name AS status,
+        s.id AS status_id,         
+        tm.name AS marche_type,
+        u.department_id,
+        d.name as department_name
+      FROM purchase_requests pr
+      LEFT JOIN status s ON pr.status_id = s.id
+      LEFT JOIN type_marches tm ON pr.type_marche_id = tm.id
+      LEFT JOIN users u ON pr.user_id = u.id
+      LEFT JOIN departments d ON u.department_id = d.id
+      WHERE pr.id = ?
+    `;
+
+    // If user is chef departement, verify they have access to this request
+    if (userRole === 'chef_departement' || userRole === 'Chef Departement') {
+      // Get the chef's department
+      const [chefDept] = await db.query(
+        'SELECT department_id FROM users WHERE id = ?',
+        [userId]
+      );
+      
+      if (chefDept.length > 0) {
+        query += ` AND u.department_id = ${chefDept[0].department_id}`;
+      } else {
+        return res.status(403).json({ error: "Accès non autorisé" });
+      }
+    } else if (userRole === 'Prof') {
+      // Verify the request belongs to the professor
+      query += ` AND pr.user_id = ${userId}`;
+    }
+
+    const [requests] = await db.query(query, [requestId]);
+
+    if (requests.length === 0) {
+      return res.status(404).json({ error: "Demande non trouvée" });
+    }
+
+    res.json({ request: requests[0] });
+  } catch (err) {
+    console.error("Error fetching request:", err);
+    res.status(500).json({ error: "Erreur lors de la récupération de la demande" });
+  }
+});
+
 // POST /api/dashboard/validate-request
 router.post("/validate-request", async (req, res) => {
   try {
