@@ -4,6 +4,11 @@ import "./App.css";
 
 import Login from "./LoginPage/login";
 
+// Comptable components
+import ComptableDashboard from "./ComptableInterface/DashboardPage/Dashboard";
+import ComptableLayout from "./ComptableInterface/Layout";
+import NotificationSend from "./ComptableInterface/NotificationSendPage/NotificationSend";
+
 // Chef Departement components
 import ChefDepartementDashboard from "./ChefDepartementInterface/DashboardPage/Dashboard";
 import ChefDepartementLayout from "./ChefDepartementInterface/Layout";
@@ -15,13 +20,6 @@ import ProfDashboard from "./ProfInterface/DashboardPage/dashboard";
 import ProfLayout from "./ProfInterface/Layout";
 import RequestPage from "./ProfInterface/RequestPage/RequestPage";
 
-// Placeholder components for other roles (to be implemented later)
-const ComptableDashboard = () => (
-  <div>Comptable Dashboard (To be implemented)</div>
-);
-const ComptableLayout = ({ children }) => (
-  <div className="dashboard-container">{children}</div>
-);
 
 const DirectionDashboard = () => (
   <div>Direction Dashboard (To be implemented)</div>
@@ -45,6 +43,7 @@ function App() {
         {/* Comptable routes */}
         <Route path="/comptable" element={<ComptableLayout />}>
           <Route path="dashboard" element={<ComptableDashboard />} />
+          <Route path="notifications" element={<NotificationSend />} />
         </Route>
 
         {/* Direction routes */}
