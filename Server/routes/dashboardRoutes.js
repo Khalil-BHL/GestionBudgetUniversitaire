@@ -23,7 +23,8 @@ router.get("/", async (req, res) => {
         s.id AS status_id,         
         tm.name AS marche_type,
         u.department_id,
-        d.name as department_name
+        d.name as department_name,
+        u.name as user_name
       FROM purchase_requests pr
       LEFT JOIN status s ON pr.status_id = s.id
       LEFT JOIN type_marches tm ON pr.type_marche_id = tm.id
@@ -112,7 +113,8 @@ router.get("/request/:id", async (req, res) => {
         s.id AS status_id,         
         tm.name AS marche_type,
         u.department_id,
-        d.name as department_name
+        d.name as department_name,
+        u.name as user_name
       FROM purchase_requests pr
       LEFT JOIN status s ON pr.status_id = s.id
       LEFT JOIN type_marches tm ON pr.type_marche_id = tm.id

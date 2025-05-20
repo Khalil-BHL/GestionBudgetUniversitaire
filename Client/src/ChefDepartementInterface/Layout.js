@@ -33,10 +33,10 @@ function Layout() {
               </Link>
             </li>
             <li>
-              <div className="nav-item">
+              <Link to="/chef-departement/notifications" className="nav-item">
                 <span className="icon"><MdNotifications /></span>
                 <span>Notifications</span>
-              </div>
+              </Link>
             </li>
           </ul>
         </nav>

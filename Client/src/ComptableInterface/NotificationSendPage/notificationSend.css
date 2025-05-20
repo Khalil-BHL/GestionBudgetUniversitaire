@@ -1,27 +1,32 @@
 /* Notification Page Content */
-.notification-content {
-  width: 100%;
-  background-color: #f5f7fb;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  padding: 30px;
+.notifications-bg {
+  background: #f5f7fa;
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
 }
 
-.notification-header {
-  margin-bottom: 30px;
+.notifications-container {
+  padding: 40px 20px;
 }
 
-.notification-header h2 {
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: #333;
+.notifications-title {
+  max-width: 1240px;
+  margin: 0 auto 30px auto;
+  color: #222;
+  font-size: 26px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-align: left;
 }
 
-/* Notification Container */
-.notification-container {
-  background-color: white;
-  border-radius: 15px;
-  padding: 25px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+.notifications-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 30px 20px;
+  max-width: 1200px;
+  margin: auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 /* Recipient Options */
@@ -104,6 +109,7 @@
 
 .form-group textarea {
   resize: vertical;
+  min-height: 120px;
 }
 
 .form-group input:focus,
@@ -144,8 +150,8 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .notification-content {
-    padding: 15px;
+  .notifications-container {
+    padding: 20px 15px;
   }
   
   .recipient-types {

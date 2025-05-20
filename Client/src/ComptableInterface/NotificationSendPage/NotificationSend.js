@@ -69,26 +69,75 @@ function NotificationSend() {
 
   const fetchUsers = async () => {
     try {
-      // Using static users for now, can be replaced with API call
-      const staticUsers = [
-        { id: 1, name: "John Doe", email: "john@univ.edu", role: "Prof" },
-        { id: 2, name: "Jane Smith", email: "jane@univ.edu", role: "Prof" },
-        { id: 3, name: "Robert Johnson", email: "robert@univ.edu", role: "Chef Departement" },
-        { id: 4, name: "Emily Davis", email: "emily@univ.edu", role: "Prof" }
-      ];
-      setUsers(staticUsers);
+      console.log("Fetching users...");
+      const response = await axios.get("http://localhost:5000/api/user/list", {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
       
-      // Uncomment to use API when available
-      /*
-      const response = await axios.get("http://localhost:5000/api/users");
+      console.log("API Response:", response.data);
+      
       if (response.data && Array.isArray(response.data)) {
-        setUsers(response.data);
+        // Filter out users with role_id == 1
+        const filteredUsers = response.data.filter(user => user.role_id !== 1);
+        console.log("Filtered users:", filteredUsers);
+        setUsers(filteredUsers);
       } else if (response.data && response.data.users) {
-        setUsers(response.data.users);
+        // Filter out users with role_id == 1
+        const filteredUsers = response.data.users.filter(user => user.role_id !== 1);
+        console.log("Filtered users:", filteredUsers);
+        setUsers(filteredUsers);
+      } else {
+        console.error("Unexpected API response format:", response.data);
+        Swal.fire({
+          position: "top-end",
+          icon: "error",
+          title: "Format de réponse inattendu",
+          text: "La réponse du serveur n'est pas dans le format attendu",
+          showConfirmButton: false,
+          timer: 3000
+        });
       }
-      */
     } catch (err) {
-      console.error("Erreur lors de la récupération des utilisateurs", err);
+      console.error("Detailed error:", err);
+      console.error("Error response:", err.response);
+      
+      let errorMessage = "Erreur lors de la récupération des utilisateurs";
+      
+      if (err.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error("Error status:", err.response.status);
+        console.error("Error data:", err.response.data);
+        
+        if (err.response.status === 401) {
+          errorMessage = "Session expirée. Veuillez vous reconnecter.";
+          // Redirect to login page
+          window.location.href = "/";
+          return;
+        } else if (err.response.status === 403) {
+          errorMessage = "Accès non autorisé";
+        } else if (err.response.data && err.response.data.message) {
+          errorMessage = err.response.data.message;
+        }
+      } else if (err.request) {
+        // The request was made but no response was received
+        console.error("No response received:", err.request);
+        errorMessage = "Le serveur ne répond pas. Veuillez vérifier votre connexion.";
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error("Error message:", err.message);
+      }
+
+      Swal.fire({
+        position: "top-end",
+        icon: "error",
+        title: errorMessage,
+        showConfirmButton: false,
+        timer: 3000
+      });
     }
   };
 
@@ -155,119 +204,117 @@ function NotificationSend() {
   };
 
   return (
-    <div className="notification-content">
-      <header className="notification-header">
-        <h2>Envoyer des Notifications</h2>
-      </header>
-
-      <div className="notification-container">
-        <div className="notification-options">
-          <div className="recipient-types">
-            <div 
-              className={`recipient-option ${notificationData.recipientType === "all" ? "active" : ""}`}
-              onClick={() => setNotificationData({...notificationData, recipientType: "all"})}
-            >
-              <div className="recipient-icon">
-                <FaUsers />
+    <div className="notifications-bg">
+      <div className="notifications-container">
+        <h2 className="notifications-title">ENVOYER DES NOTIFICATIONS</h2>
+        <div className="notifications-card">
+          <div className="notification-options">
+            <div className="recipient-types">
+              <div 
+                className={`recipient-option ${notificationData.recipientType === "all" ? "active" : ""}`}
+                onClick={() => setNotificationData({...notificationData, recipientType: "all"})}
+              >
+                <div className="recipient-icon">
+                  <FaUsers />
+                </div>
+                <span>Tous les utilisateurs</span>
               </div>
-              <span>Tous les utilisateurs</span>
-            </div>
-            
-            <div 
-              className={`recipient-option ${notificationData.recipientType === "department" ? "active" : ""}`}
-              onClick={() => setNotificationData({...notificationData, recipientType: "department"})}
-            >
-              <div className="recipient-icon">
-                <FaBuilding />
+              
+              <div 
+                className={`recipient-option ${notificationData.recipientType === "department" ? "active" : ""}`}
+                onClick={() => setNotificationData({...notificationData, recipientType: "department"})}
+              >
+                <div className="recipient-icon">
+                  <FaBuilding />
+                </div>
+                <span>Département spécifique</span>
               </div>
-              <span>Département spécifique</span>
-            </div>
-            
-            <div 
-              className={`recipient-option ${notificationData.recipientType === "user" ? "active" : ""}`}
-              onClick={() => setNotificationData({...notificationData, recipientType: "user"})}
-            >
-              <div className="recipient-icon">
-                <FaUser />
+              
+              <div 
+                className={`recipient-option ${notificationData.recipientType === "user" ? "active" : ""}`}
+                onClick={() => setNotificationData({...notificationData, recipientType: "user"})}
+              >
+                <div className="recipient-icon">
+                  <FaUser />
+                </div>
+                <span>Utilisateur spécifique</span>
               </div>
-              <span>Utilisateur spécifique</span>
             </div>
           </div>
+
+          <form className="notification-form" onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="title">Titre de la notification</label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                value={notificationData.title}
+                onChange={handleChange}
+                placeholder="Entrez le titre de la notification"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="message">Message</label>
+              <textarea
+                id="message"
+                name="message"
+                value={notificationData.message}
+                onChange={handleChange}
+                placeholder="Entrez le contenu de votre notification"
+                required
+              ></textarea>
+            </div>
+
+            {notificationData.recipientType === "department" && (
+              <div className="form-group">
+                <label htmlFor="departmentId">Sélectionnez un département</label>
+                <select
+                  id="departmentId"
+                  name="departmentId"
+                  value={notificationData.departmentId}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Choisir un département</option>
+                  {departments.map((dept) => (
+                    <option key={dept.id} value={dept.id}>
+                      {dept.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {notificationData.recipientType === "user" && (
+              <div className="form-group">
+                <label htmlFor="userId">Sélectionnez un utilisateur</label>
+                <select
+                  id="userId"
+                  name="userId"
+                  value={notificationData.userId}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Sélectionner un utilisateur</option>
+                  {users.map((user) => (
+                    <option key={user.id} value={user.id}>
+                      {user.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className="form-actions">
+              <button type="submit" className="send-button" disabled={loading}>
+                <FaPaperPlane /> {loading ? "Envoi en cours..." : "Envoyer la notification"}
+              </button>
+            </div>
+          </form>
         </div>
-
-        <form className="notification-form" onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="title">Titre de la notification</label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              value={notificationData.title}
-              onChange={handleChange}
-              placeholder="Entrez le titre de la notification"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="message">Message</label>
-            <textarea
-              id="message"
-              name="message"
-              rows="6"
-              value={notificationData.message}
-              onChange={handleChange}
-              placeholder="Entrez le contenu de votre notification"
-              required
-            ></textarea>
-          </div>
-
-          {notificationData.recipientType === "department" && (
-            <div className="form-group">
-              <label htmlFor="departmentId">Sélectionnez un département</label>
-              <select
-                id="departmentId"
-                name="departmentId"
-                value={notificationData.departmentId}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Choisir un département</option>
-                {departments.map((dept) => (
-                  <option key={dept.id} value={dept.id}>
-                    {dept.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {notificationData.recipientType === "user" && (
-            <div className="form-group">
-              <label htmlFor="userId">Sélectionnez un utilisateur</label>
-              <select
-                id="userId"
-                name="userId"
-                value={notificationData.userId}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Choisir un utilisateur</option>
-                {users.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.name} ({user.email}) - {user.role}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          <div className="form-actions">
-            <button type="submit" className="send-button" disabled={loading}>
-              <FaPaperPlane /> {loading ? "Envoi en cours..." : "Envoyer la notification"}
-            </button>
-          </div>
-        </form>
       </div>
     </div>
   );

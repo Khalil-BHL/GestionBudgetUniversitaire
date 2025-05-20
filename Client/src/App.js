@@ -14,11 +14,13 @@ import ChefDepartementDashboard from "./ChefDepartementInterface/DashboardPage/D
 import ChefDepartementLayout from "./ChefDepartementInterface/Layout";
 import RequestsList from "./ChefDepartementInterface/RequestsListPage/RequestsList";
 import ChefRequestPage from "./ChefDepartementInterface/RequestPage/RequestPage";
+import ChefNotifications from "./ChefDepartementInterface/Notifications/Notifications";
 
 // Professor components
 import ProfDashboard from "./ProfInterface/DashboardPage/dashboard";
 import ProfLayout from "./ProfInterface/Layout";
 import RequestPage from "./ProfInterface/RequestPage/RequestPage";
+import ProfNotifications from "./ProfInterface/Notifications/Notifications";
 
 
 const DirectionDashboard = () => (
@@ -38,6 +40,7 @@ function App() {
         <Route path="/professor" element={<ProfLayout />}>
           <Route path="dashboard" element={<ProfDashboard />} />
           <Route path="request" element={<RequestPage />} />
+          <Route path="notifications" element={<ProfNotifications />} />
         </Route>
 
         {/* Comptable routes */}
@@ -56,6 +59,7 @@ function App() {
           <Route path="dashboard" element={<ChefDepartementDashboard />} />
           <Route path="requests" element={<RequestsList />} />
           <Route path="request/:id" element={<ChefRequestPage />} />
+          <Route path="notifications" element={<ChefNotifications />} />
         </Route>
       </Routes>
     </BrowserRouter>

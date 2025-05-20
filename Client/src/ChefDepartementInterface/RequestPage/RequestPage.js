@@ -133,8 +133,8 @@ function RequestPage() {
               <MdPerson />
             </div>
             <div className="detail-content">
-              <h3>Département</h3>
-              <p>{request.department_name}</p>
+              <h3>Demandeur</h3>
+              <p>{request.user_name}</p>
             </div>
           </div>
 
