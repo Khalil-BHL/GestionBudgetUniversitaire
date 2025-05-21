@@ -59,15 +59,14 @@ CREATE TABLE purchase_requests (
     FOREIGN KEY (type_marche_id) REFERENCES type_marches(id)
 );
 
-
-
 -- Create notifications table
 CREATE TABLE notifications (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
+    destinator_user_id INT,
     request_id INT,
+    title VARCHAR(255) NOT NULL,
     message TEXT NOT NULL,
-    read BOOLEAN DEFAULT FALSE,
+    is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (request_id) REFERENCES purchase_requests(id)
@@ -87,11 +86,59 @@ CREATE TABLE budgets (
 CREATE TABLE validations (
     id INT AUTO_INCREMENT PRIMARY KEY,
     request_id INT,
-    status VARCHAR(255),
+    validator_id INT,
+    status_id INT,
     comment TEXT,
     validated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (request_id) REFERENCES purchase_requests(id)
+    FOREIGN KEY (request_id) REFERENCES purchase_requests(id),
+    FOREIGN KEY (status_id) REFERENCES statuses(id)
 );
+
+-- Create trigger for notifications on validation
+DELIMITER //
+CREATE TRIGGER after_validation_insert
+AFTER INSERT ON validations
+FOR EACH ROW
+BEGIN
+    -- Get the request creator and their department head
+    DECLARE request_creator_id INT;
+    DECLARE department_head_id INT;
+    DECLARE request_id INT;
+    DECLARE validation_comment TEXT;
+    
+    -- Get the request creator's ID and department head's ID
+    SELECT pr.user_id, u.department_id INTO request_creator_id, department_head_id
+    FROM purchase_requests pr
+    JOIN users u ON pr.user_id = u.id
+    WHERE pr.id = NEW.request_id;
+    
+    -- Get the department head's user ID
+    SELECT id INTO department_head_id
+    FROM users
+    WHERE department_id = department_head_id AND role_id = 2; -- Assuming role_id 2 is for department head
+    
+    -- Create notification for request creator
+    INSERT INTO notifications (destinator_user_id, request_id, title, message, created_at)
+    VALUES (
+        request_creator_id,
+        NEW.request_id,
+        CONCAT('Mises à jour concernant votre demande #', NEW.request_id),
+        NEW.comment,
+        CURRENT_TIMESTAMP
+    );
+    
+    -- Create notification for department head
+    INSERT INTO notifications (destinator_user_id, request_id, title, message, created_at)
+    VALUES (
+        department_head_id,
+        NEW.request_id,
+        CONCAT('Mises à jour concernant la demande #', NEW.request_id),
+        NEW.comment,
+        CURRENT_TIMESTAMP
+    );
+END //
+DELIMITER ;
+
 -- the database is fully inserted
 
 -- saisir des entrées dans la table purchase_requests

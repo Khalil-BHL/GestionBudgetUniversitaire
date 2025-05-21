@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../config/db");
+const pool = require("../config/db");
 
 // GET /api/dashboard
 router.get("/", async (req, res) => {
@@ -35,7 +35,7 @@ router.get("/", async (req, res) => {
     // If user is chef departement, filter by their department
     if (userRole === 'chef_departement' || userRole === 'Chef Departement') {
       // First get the chef's department
-      const [chefDept] = await db.query(
+      const [chefDept] = await pool.query(
         'SELECT department_id FROM users WHERE id = ?',
         [userId]
       );
@@ -55,7 +55,7 @@ router.get("/", async (req, res) => {
 
     query += ` ORDER BY pr.created_at DESC`;
 
-    const [requests] = await db.query(query);
+    const [requests] = await pool.query(query);
 
     // Compute some statistics
     const total = requests.length;
@@ -126,7 +126,7 @@ router.get("/request/:id", async (req, res) => {
     // If user is chef departement, verify they have access to this request
     if (userRole === 'chef_departement' || userRole === 'Chef Departement') {
       // Get the chef's department
-      const [chefDept] = await db.query(
+      const [chefDept] = await pool.query(
         'SELECT department_id FROM users WHERE id = ?',
         [userId]
       );
@@ -141,7 +141,7 @@ router.get("/request/:id", async (req, res) => {
       query += ` AND pr.user_id = ${userId}`;
     }
 
-    const [requests] = await db.query(query, [requestId]);
+    const [requests] = await pool.query(query, [requestId]);
 
     if (requests.length === 0) {
       return res.status(404).json({ error: "Demande non trouvée" });
@@ -161,7 +161,7 @@ router.post("/validate-request", async (req, res) => {
     
     if (decision === 'approved') {
       // Get the status ID for "En cours d'examen"
-      const [statusResult] = await db.query(
+      const [statusResult] = await pool.query(
         "SELECT id FROM status WHERE name = ?",
         ["En cours d'examen"]
       );
@@ -173,13 +173,13 @@ router.post("/validate-request", async (req, res) => {
       const statusId = statusResult[0].id;
 
       // Update request status to "En cours d'examen" and store optional comment
-      await db.query(
+      await pool.query(
         "UPDATE purchase_requests SET status_id = ?, motif = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
         [statusId, comment || null, requestId]
       );
     } else if (decision === 'rejected') {
       // Get the status ID for "Rejeté"
-      const [statusResult] = await db.query(
+      const [statusResult] = await pool.query(
         "SELECT id FROM status WHERE name = ?",
         ["Rejeté"]
       );
@@ -191,7 +191,7 @@ router.post("/validate-request", async (req, res) => {
       const statusId = statusResult[0].id;
 
       // Update request status to "Rejeté" and add rejection reason
-      await db.query(
+      await pool.query(
         "UPDATE purchase_requests SET status_id = ?, motif = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
         [statusId, rejectionReason, requestId]
       );
@@ -204,6 +204,61 @@ router.post("/validate-request", async (req, res) => {
   } catch (err) {
     console.error("Error validating request:", err);
     res.status(500).json({ error: "Failed to validate request" });
+  }
+});
+
+// POST /api/dashboard/update-status
+router.post("/update-status", async (req, res) => {
+  try {
+    const { requestId, newStatus, validatorId, validatorName } = req.body;
+
+    // Get the status ID for the new status
+    const [statusResult] = await pool.query(
+      "SELECT id FROM status WHERE name = ?",
+      [newStatus]
+    );
+
+    if (statusResult.length === 0) {
+      return res.status(404).json({ error: "Status not found" });
+    }
+
+    const statusId = statusResult[0].id;
+
+    // Start a transaction
+    const connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    try {
+      // Update request status
+      await connection.query(
+        "UPDATE purchase_requests SET status_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+        [statusId, requestId]
+      );
+
+      // Create validation record
+      const comment = `Votre demande est validée par ${validatorName} au statut '${newStatus}'`;
+      await connection.query(
+        "INSERT INTO validations (request_id, validator_id, status_id, comment, validated_at) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)",
+        [requestId, validatorId, statusId, comment]
+      );
+
+      // Commit the transaction
+      await connection.commit();
+      connection.release();
+
+      res.json({ 
+        status: "success",
+        message: "Status updated successfully"
+      });
+    } catch (err) {
+      // Rollback in case of error
+      await connection.rollback();
+      connection.release();
+      throw err;
+    }
+  } catch (err) {
+    console.error("Error updating status:", err);
+    res.status(500).json({ error: "Failed to update status" });
   }
 });
 

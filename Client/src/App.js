@@ -1,11 +1,7 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 
 import Login from "./LoginPage/login";
-// Admin components
-import AdminDashboard from "./AdminInterface/DashboardPage/dashboard";
-import AdminLayout from "./AdminInterface/layout";
-import UsermanagementPage from "./AdminInterface/UsermanagementPage/users";
 // Comptable components
 import ComptableDashboard from "./ComptableInterface/DashboardPage/Dashboard";
 import ComptableLayout from "./ComptableInterface/Layout";
@@ -24,6 +20,11 @@ import ProfLayout from "./ProfInterface/Layout";
 import ProfNotifications from "./ProfInterface/Notifications/Notifications";
 import RequestPage from "./ProfInterface/RequestPage/RequestPage";
 
+// Admin components
+import AdminLayout from "./AdminInterface/layout";
+import AdminDashboard from "./AdminInterface/DashboardPage/dashboard";
+import UserManagement from "./AdminInterface/UsermanagementPage/users";
+
 const DirectionDashboard = () => (
   <div>Direction Dashboard (To be implemented)</div>
 );
@@ -33,16 +34,9 @@ const DirectionLayout = ({ children }) => (
 
 function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
-        {/* Admin routes */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="users" element={<UsermanagementPage />} />
-        </Route>
-
         <Route path="/" element={<Login />} />
-
         {/* Professor routes */}
         <Route path="/professor" element={<ProfLayout />}>
           <Route path="dashboard" element={<ProfDashboard />} />
@@ -68,8 +62,14 @@ function App() {
           <Route path="request/:id" element={<ChefRequestPage />} />
           <Route path="notifications" element={<ChefNotifications />} />
         </Route>
+
+        {/* Admin routes */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="users" element={<UserManagement />} />
+        </Route>
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
 

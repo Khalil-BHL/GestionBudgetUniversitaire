@@ -1,44 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './notifications.css';
-
-const notifications = [
-  {
-    status: { label: 'Demande approuvée', color: 'green' },
-    senderRole: 'chef_departement',
-    message: 'La demande pour l\'article "Imprimante laser HP" a été approuvée.',
-    demandeId: 2345,
-    time: '2025-11-24T09:30:00'
-  },
-  {
-    status: { label: 'En cours d\'examen', color: 'orange' },
-    senderRole: 'chef_departement',
-    message: 'Le chef de département a reçu votre demande. Elle est en cours d\'examen.',
-    demandeId: 2345,
-    time: '2018-11-24T09:30:00'
-  },
-  {
-    status: { label: 'En livraison', color: 'purple' },
-    senderRole: 'comptable',
-    message: 'L\'article "Imprimante laser HP" est en cours de livraison.',
-    demandeId: 2345,
-    time: '2018-11-24T09:30:00'
-  },
-  {
-    status: { label: 'Reçu', color: 'blue' },
-    senderRole: 'comptable',
-    message: 'L\'article "Imprimante laser HP" a été reçu.',
-    demandeId: 2345,
-    time: '2018-11-24T09:30:00'
-  }
-];
-
-function getRoleLabel(role) {
-  const roles = {
-    chef_departement: 'Chef de département',
-    comptable: 'Comptable'
-  };
-  return roles[role] || role;
-}
 
 function formatDate(dateString) {
   return new Date(dateString).toLocaleString('fr-FR', {
@@ -48,39 +10,131 @@ function formatDate(dateString) {
 }
 
 function Notifications() {
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  const fetchNotifications = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      const response = await axios.get(`http://localhost:5000/api/notifications/user/${user.id}`);
+      if (response.data.status === 'success') {
+        const fetchedNotifications = response.data.notifications;
+        setNotifications(fetchedNotifications);
+        
+        // Mark unread notifications as read
+        const unreadNotifications = fetchedNotifications.filter(n => !n.is_read);
+        if (unreadNotifications.length > 0) {
+          await Promise.all(
+            unreadNotifications.map(notification =>
+              axios.put(`http://localhost:5000/api/notifications/${notification.id}/read`)
+            )
+          );
+          // Update local state to reflect read status
+          setNotifications(fetchedNotifications.map(n => ({ ...n, is_read: true })));
+        }
+      } else {
+        throw new Error(response.data.message || 'Failed to fetch notifications');
+      }
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMarkAsRead = async (notificationId) => {
+    try {
+      await axios.put(`http://localhost:5000/api/notifications/${notificationId}/read`);
+      // Update the local state to reflect the read status
+      setNotifications(notifications.map(notification => 
+        notification.id === notificationId 
+          ? { ...notification, is_read: true }
+          : notification
+      ));
+    } catch (err) {
+      console.error('Error marking notification as read:', err);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="notifications-bg">
+        <div className="notifications-container">
+          <h2 className="notifications-title">NOTIFICATIONS</h2>
+          <div className="notifications-card">
+            <div>Chargement des notifications...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="notifications-bg">
+        <div className="notifications-container">
+          <h2 className="notifications-title">NOTIFICATIONS</h2>
+          <div className="notifications-card">
+            <div className="error-message">Erreur: {error}</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="notifications-bg">
       <div className="notifications-container">
         <h2 className="notifications-title">NOTIFICATIONS</h2>
         <div className="notifications-card">
-          {notifications.map((n, idx) => (
-            <div key={idx}>
-              <div className="notification-item">
-                <button className="close-btn" aria-label="Fermer">&times;</button>
-                <div className="notification-content">
-                  <div className="notification-main">
-                    <span className={`label ${n.status.color}`}>
-                      {n.status.label}
-                    </span>
-                    <div className="notification-sender">
-                      {getRoleLabel(n.senderRole)}
+          {notifications.length === 0 ? (
+            <div className="no-notifications">Aucune notification</div>
+          ) : (
+            notifications.map((n, idx) => (
+              <div key={n.id}>
+                <div className={`notification-item ${!n.is_read ? 'unread' : ''}`}>
+                  <button 
+                    className="close-btn" 
+                    aria-label="Fermer"
+                    onClick={() => handleMarkAsRead(n.id)}
+                  >
+                    &times;
+                  </button>
+                  <div className="notification-content">
+                    <div className="notification-main">
+                      <span className={`label ${n.is_read ? 'blue' : 'orange'}`}>
+                        {n.is_read ? 'Lu' : 'Non lu'}
+                      </span>
+                      <div className="notification-title">{n.title}</div>
+                      <div className="notification-message">{n.message}</div>
+                      {n.request_id && (
+                        <div className="notification-demandeid">
+                          ID Demande : {n.request_id}
+                        </div>
+                      )}
                     </div>
-                    <div className="notification-message">{n.message}</div>
-                    <div className="notification-demandeid">
-                      ID Demande : {n.demandeId}
+                    <div className="notification-time">
+                      <span className="clock-icon">&#128337;</span>
+                      {formatDate(n.created_at)}
                     </div>
-                  </div>
-                  <div className="notification-time">
-                    <span className="clock-icon">&#128337;</span>
-                    {formatDate(n.time)}
                   </div>
                 </div>
+                {idx < notifications.length - 1 && (
+                  <div className="notification-separator" />
+                )}
               </div>
-              {idx < notifications.length - 1 && (
-                <div className="notification-separator" />
-              )}
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ import axios from "axios";
 import "font-awesome/css/font-awesome.min.css";
 import React, { useEffect, useState } from "react";
 import "./dashboard.css";
+import Swal from "sweetalert2";
 
 function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -19,35 +20,56 @@ function Dashboard() {
   const [editingStatus, setEditingStatus] = useState(null);
   const requestsPerPage = 5;
 
-  // Define available statuses
-  const availableStatuses = [
-    "Brouillon",
-    "Soumis",
-    "En cours d'examen",
-    "Approuvé",
-    "Rejeté",
-    "Commandé",
-    "Reçu"
-  ];
 
-  // Function to update request status (client-side only for now)
-  const updateRequestStatus = (requestId, newStatus) => {
-    console.log(`Would update request ${requestId} to status: ${newStatus}`);
-    
-    // Update the UI without making an API call
-    const updatedRequests = requests.map(req => {
-      if (req.id === requestId) {
-        return { ...req, status: newStatus };
+  // Function to update request status
+  const updateRequestStatus = async (requestId, newStatus) => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user) {
+        console.error("Utilisateur non connecté");
+        return;
       }
-      return req;
-    });
-    
-    setRequests(updatedRequests);
-    setFilteredRequests(updatedRequests);
-    setEditingStatus(null); // Close the dropdown
-    
-    // Show a message to the user
-    alert(`Statut mis à jour (mode local uniquement): ${newStatus}`);
+
+      // Make API call to update status and create validation record
+      const response = await axios.post("http://localhost:5000/api/dashboard/update-status", {
+        requestId,
+        newStatus,
+        validatorId: user.id,
+        validatorName: user.name
+      });
+
+      if (response.data.status === 'success') {
+        // Update the UI
+        const updatedRequests = requests.map(req => {
+          if (req.id === requestId) {
+            return { ...req, status: newStatus };
+          }
+          return req;
+        });
+        
+        setRequests(updatedRequests);
+        setFilteredRequests(updatedRequests);
+        setEditingStatus(null); // Close the dropdown
+        
+        // Show success message
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "Statut mis à jour avec succès",
+          showConfirmButton: false,
+          timer: 1500
+        });
+      }
+    } catch (err) {
+      console.error("Erreur lors de la mise à jour du statut:", err);
+      Swal.fire({
+        position: "top-end",
+        icon: "error",
+        title: "Erreur lors de la mise à jour du statut",
+        showConfirmButton: false,
+        timer: 1500
+      });
+    }
   };
 
   useEffect(() => {
@@ -412,7 +434,7 @@ function Dashboard() {
                           onBlur={() => setEditingStatus(null)}
                         >
                           {statuses
-                            .filter(status => status.id > 3 && status.id !== 5)
+                            .filter(status => status.id !== 1 && status.id !== 5)
                             .map(status => (
                               <option key={status.id} value={status.name}>
                                 {status.name}

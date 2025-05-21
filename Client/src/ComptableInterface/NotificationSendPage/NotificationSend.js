@@ -43,25 +43,12 @@ function NotificationSend() {
 
   const fetchDepartments = async () => {
     try {
-      // Using static departments for now, can be replaced with API call
-      const staticDepartments = [
-        { id: 1, name: "Informatique" },
-        { id: 2, name: "GUE" },
-        { id: 3, name: "TM" },
-        { id: 4, name: "3M" },
-        { id: 5, name: "MI" }
-      ];
-      setDepartments(staticDepartments);
-      
-      // Uncomment to use API when available
-      /*
       const response = await axios.get("http://localhost:5000/api/departments");
       if (response.data && Array.isArray(response.data)) {
         setDepartments(response.data);
-      } else if (response.data && response.data.departments) {
-        setDepartments(response.data.departments);
+      } else {
+        console.error('Invalid departments data format:', response.data);
       }
-      */
     } catch (err) {
       console.error("Erreur lors de la récupération des départements", err);
     }
@@ -151,34 +138,50 @@ function NotificationSend() {
     setLoading(true);
 
     try {
-      // Prepare data based on recipient type
-      const notificationPayload = {
-        title: notificationData.title,
-        message: notificationData.message,
-        recipientType: notificationData.recipientType
-      };
-
-      // Add specific recipient data if needed
-      if (notificationData.recipientType === "department") {
-        notificationPayload.departmentId = notificationData.departmentId;
+      let recipients = [];
+      
+      // Determine recipients based on recipient type
+      if (notificationData.recipientType === "all") {
+        // Get all users except role_id 1 and 5
+        recipients = users.filter(user => user.role_id !== 1 && user.role_id !== 5)
+                         .map(user => user.id);
+      } else if (notificationData.recipientType === "department") {
+        // Get all users from the selected department
+        const departmentUsers = await axios.get(`http://localhost:5000/api/departments/${notificationData.departmentId}/users`);
+        recipients = departmentUsers.data
+          .filter(user => user.role_id !== 1 && user.role_id !== 5)
+          .map(user => user.id);
       } else if (notificationData.recipientType === "user") {
-        notificationPayload.userId = notificationData.userId;
+        // Single user
+        recipients = [notificationData.userId];
       }
 
-      // For now, we'll just log the payload and show a success message
-      // This would be replaced with an actual API call
-      console.log("Sending notification:", notificationPayload);
-      
-      // Simulate API call
-      // const response = await axios.post("http://localhost:5000/api/notifications/send", notificationPayload);
+      // Get current user info
+      const currentUser = JSON.parse(localStorage.getItem("user"));
+      if (!currentUser) {
+        throw new Error("User not authenticated");
+      }
+
+      // Send notification to each recipient
+      const notificationPromises = recipients.map(userId => 
+        axios.post("http://localhost:5000/api/notifications", {
+          title: notificationData.title,
+          message: notificationData.message,
+          user_id: userId,
+          sender_id: currentUser.id
+        })
+      );
+
+      await Promise.all(notificationPromises);
       
       // Show success message
       Swal.fire({
         position: "top-end",
         icon: "success",
-        title: "Notification envoyée avec succès",
+        title: "Notification(s) envoyée(s) avec succès",
+        text: `${recipients.length} destinataire(s)`,
         showConfirmButton: false,
-        timer: 1500
+        timer: 2000
       });
 
       // Reset form
@@ -191,12 +194,24 @@ function NotificationSend() {
       });
     } catch (err) {
       console.error("Erreur lors de l'envoi de la notification:", err);
+      let errorMessage = "Erreur lors de l'envoi de la notification";
+      
+      if (err.response) {
+        if (err.response.status === 401) {
+          errorMessage = "Session expirée. Veuillez vous reconnecter.";
+          window.location.href = "/";
+          return;
+        } else if (err.response.data && err.response.data.message) {
+          errorMessage = err.response.data.message;
+        }
+      }
+
       Swal.fire({
         position: "top-end",
         icon: "error",
-        title: "Erreur lors de l'envoi de la notification",
+        title: errorMessage,
         showConfirmButton: false,
-        timer: 1500
+        timer: 2000
       });
     } finally {
       setLoading(false);

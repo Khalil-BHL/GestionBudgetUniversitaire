@@ -60,6 +60,10 @@ function Login() {
         case "Chef Departement":
           navigate("/chef-departement/dashboard");
           break;
+        case "admin":
+        case "Admin":
+          navigate("/admin/dashboard");
+          break;
         default:
           console.warn("Unknown role:", response.data.user.role);
           navigate("/");

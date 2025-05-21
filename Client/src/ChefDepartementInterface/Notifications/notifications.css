@@ -56,6 +56,11 @@
     min-height: 80px;
     display: flex;
     align-items: flex-start;
+    transition: background-color 0.2s;
+  }
+
+  .notification-item.unread {
+    background-color: #f8f9fa;
   }
   
   .notification-content {
@@ -65,7 +70,6 @@
     width: 100%;
     padding: 25px 0 10px 0;
     flex-wrap: wrap;
-    background-color: #fff;
   }
   
   .notification-main {
@@ -88,8 +92,6 @@
   .orange { background: #f59e42; }
   .purple { background: #7c3aed; }
   .blue { background: #38bdf8; }
-  
-  
   
   .notification-sender {
     font-weight: bold;
@@ -135,6 +137,20 @@
     height: 2px;
     background-color: #eee;
     margin: 15px 60px 0 70px;
+  }
+
+  .error-message {
+    color: #dc2626;
+    font-size: 16px;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .no-notifications {
+    color: #6b7280;
+    font-size: 16px;
+    text-align: center;
+    padding: 20px;
   }
   
   @media (max-width: 768px) {
