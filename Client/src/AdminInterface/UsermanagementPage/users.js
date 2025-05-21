@@ -8,7 +8,9 @@ function App() {
   const [form, setForm] = useState({
     name: "",
     email: "",
+    password: "",
     role: "Professeur",
+    department: "",
     id: null,
   });
   const [editing, setEditing] = useState(false);
@@ -19,20 +21,27 @@ function App() {
       .then((data) => setUsers(data));
   }, []);
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const payload = {
+      name: form.name,
+      email: form.email,
+      password: form.password,
+      role: form.role,
+      department: form.department,
+    };
+
     if (editing) {
       fetch(`${apiUrl}/${form.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          role: form.role,
-        }),
+        body: JSON.stringify(payload),
       })
         .then((res) => res.json())
         .then((updatedUser) => {
@@ -45,11 +54,7 @@ function App() {
       fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          role: form.role,
-        }),
+        body: JSON.stringify(payload),
       })
         .then((res) => res.json())
         .then((newUser) => {
@@ -60,7 +65,14 @@ function App() {
   };
 
   const resetForm = () => {
-    setForm({ name: "", email: "", role: "Professeur", id: null });
+    setForm({
+      name: "",
+      email: "",
+      password: "",
+      role: "Professeur",
+      department: "",
+      id: null,
+    });
     setEditing(false);
   };
 
@@ -68,16 +80,20 @@ function App() {
     setForm({
       name: user.name,
       email: user.email,
+      password: "",
       role: user.role,
+      department: user.department,
       id: user.id,
     });
     setEditing(true);
   };
 
   const handleDelete = (id) => {
-    fetch(`${apiUrl}/${id}`, { method: "DELETE" }).then(() => {
-      setUsers(users.filter((u) => u.id !== id));
-    });
+    if (window.confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) {
+      fetch(`${apiUrl}/${id}`, { method: "DELETE" }).then(() => {
+        setUsers(users.filter((u) => u.id !== id));
+      });
+    }
   };
 
   return (
@@ -102,14 +118,38 @@ function App() {
           required
           className="input"
         />
+        <input
+          name="password"
+          type="password"
+          placeholder="Mot de passe"
+          value={form.password}
+          onChange={handleChange}
+          className="input"
+          required={!editing}
+        />
         <select
           name="role"
           value={form.role}
           onChange={handleChange}
           className="select"
+          required
         >
           <option value="Chef Département">Chef Département</option>
           <option value="Professeur">Professeur</option>
+        </select>
+
+        <select
+          name="department"
+          value={form.department}
+          onChange={handleChange}
+          className="select"
+          required
+        >
+          <option value="">Sélectionnez un département</option>
+          <option value="Informatique">Informatique</option>
+          <option value="Mathématiques">Mathématiques</option>
+          <option value="Physique">Physique</option>
+          <option value="Chimie">Chimie</option>
         </select>
 
         <div className="buttonsGroup">
@@ -130,9 +170,17 @@ function App() {
 
       <ul className="usersList">
         {users.map((user) => (
-          <li key={user.id} className="userItem">
+          <li
+            key={user.id}
+            className="userItem"
+            style={{
+              backgroundColor:
+                user.role === "Chef Département" ? "#E0F7FA" : "#F1F8E9",
+            }}
+          >
             <div>
-              <strong>{user.name}</strong> — {user.email} — <em>{user.role}</em>
+              <strong>{user.name}</strong> — {user.email} — <em>{user.role}</em>{" "}
+              — {user.department}
             </div>
             <div>
               <button onClick={() => handleEdit(user)} className="btn btn-edit">
