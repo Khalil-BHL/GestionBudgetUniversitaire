@@ -101,7 +101,7 @@ function Dashboard() {
   return (
     <div className="dashboard-content">
       <header className="dashboard-header">
-        <h2>Bonjour 👋</h2>
+        <h2>Bonjour {JSON.parse(localStorage.getItem("user"))?.name || ""} 👋</h2>
       </header>
 
       <div className="stats-container">

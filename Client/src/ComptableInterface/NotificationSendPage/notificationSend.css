@@ -1,0 +1,164 @@
+/* Notification Page Content */
+.notifications-bg {
+  background: #f5f7fa;
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+}
+
+.notifications-container {
+  padding: 40px 20px;
+}
+
+.notifications-title {
+  max-width: 1240px;
+  margin: 0 auto 30px auto;
+  color: #222;
+  font-size: 26px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-align: left;
+}
+
+.notifications-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 30px 20px;
+  max-width: 1200px;
+  margin: auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Recipient Options */
+.notification-options {
+  margin-bottom: 25px;
+}
+
+.recipient-types {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.recipient-option {
+  flex: 1;
+  min-width: 200px;
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.recipient-option:hover {
+  background-color: #f9f9f9;
+  transform: translateY(-2px);
+}
+
+.recipient-option.active {
+  border-color: #00a651;
+  background-color: #e6f7ef;
+}
+
+.recipient-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+.recipient-option.active .recipient-icon {
+  background-color: #00a651;
+  color: white;
+}
+
+/* Notification Form */
+.notification-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #00a651;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.send-button {
+  padding: 12px 25px;
+  background-color: #00a651;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background-color 0.3s;
+}
+
+.send-button:hover {
+  background-color: #008c44;
+}
+
+.send-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .notifications-container {
+    padding: 20px 15px;
+  }
+  
+  .recipient-types {
+    flex-direction: column;
+  }
+  
+  .recipient-option {
+    width: 100%;
+  }
+}

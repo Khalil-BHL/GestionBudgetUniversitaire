@@ -5,6 +5,9 @@ const authRoutes = require("./routes/authRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const typeMarchesRoutes = require("./routes/typeMarchesRoutes");
 const purchaseRequestsRoutes = require("./routes/purchaseRequestsRoutes");
+const departmentsRoutes = require("./routes/departmentsRoutes");
+const statusRoutes = require("./routes/statusRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 
 // Load environment variables
@@ -21,6 +24,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/type-marches", typeMarchesRoutes);
 app.use("/api/purchase-requests", purchaseRequestsRoutes);
+app.use("/api/departments", departmentsRoutes);
+app.use("/api/status", statusRoutes);
+app.use("/api/user", userRoutes);
 
 // Health check route
 app.get("/", (req, res) => {
