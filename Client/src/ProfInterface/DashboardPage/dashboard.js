@@ -14,35 +14,29 @@ function Dashboard() {
   const requestsPerPage = 5;
 
   useEffect(() => {
-    // Get user info from localStorage
     const user = JSON.parse(localStorage.getItem("user"));
-    
-    // Check if user is logged in
     if (!user) {
       console.error("Utilisateur non connecté");
-      // Optionally redirect to login page
       window.location.href = "/";
       return;
     }
 
-    // Verify user role
-    if (user.role !== 'Prof') {
+    if (user.role !== "Prof") {
       console.error("Accès non autorisé");
       window.location.href = "/";
       return;
     }
-    
+
     axios
       .get("http://localhost:5000/api/dashboard", {
         params: {
           userId: user.id,
-          userRole: user.role
-        }
+          userRole: user.role,
+        },
       })
       .then((res) => {
-        // Filter requests for the logged-in professor
         const professorRequests = res.data.requests.filter(
-          request => request.user_id === user.id
+          (request) => request.user_id === user.id
         );
         setStats(res.data.stats);
         setRequests(professorRequests);
@@ -107,7 +101,6 @@ function Dashboard() {
   });
 
   const totalPages = Math.ceil(sortedRequests.length / requestsPerPage);
-
   const paginatedRequests = sortedRequests.slice(
     (currentPage - 1) * requestsPerPage,
     currentPage * requestsPerPage
@@ -120,36 +113,49 @@ function Dashboard() {
       </header>
 
       <div className="stats-container">
-        {stats.map((stat, index) => (
-          <div className="stat-card" key={index}>
-            <div className="stat-icon" style={{ backgroundColor: stat.color }}>
-              <i className={`fa ${stat.icon || "fa-chart-bar"}`}></i>
-            </div>
-            <div className="stat-info">
-              <p className="stat-title">{stat.title}</p>
-              <h3 className="stat-value">{stat.value}</h3>
-              {stat.change && (
-                <p
-                  className={`stat-change ${
-                    stat.change.startsWith("+") ? "positive" : "negative"
-                  }`}
-                >
-                  {stat.change} ce mois
-                </p>
+        {stats.map((stat, index) => {
+          let iconClass = "fa-chart-bar";
+          if (stat.title.toLowerCase().includes("total"))
+            iconClass = "fa-file-alt";
+          else if (stat.title.toLowerCase().includes("approved"))
+            iconClass = "fa-check-circle";
+          else if (stat.title.toLowerCase().includes("review"))
+            iconClass = "fa-hourglass-half";
+
+          return (
+            <div className="stat-card" key={index}>
+              <div
+                className="stat-icon"
+                style={{ backgroundColor: stat.color }}
+              >
+                <i className={`fa ${iconClass}`}></i>
+              </div>
+              <div className="stat-info">
+                <p className="stat-title">{stat.title}</p>
+                <h3 className="stat-value">{stat.value}</h3>
+                {stat.change && (
+                  <p
+                    className={`stat-change ${
+                      stat.change.startsWith("+") ? "positive" : "negative"
+                    }`}
+                  >
+                    {stat.change} ce mois
+                  </p>
+                )}
+              </div>
+              {index === 2 && (
+                <div className="active-users">
+                  <div className="user-avatars">
+                    <span className="avatar">👤</span>
+                    <span className="avatar">👤</span>
+                    <span className="avatar">👤</span>
+                    <span className="avatar">👤</span>
+                  </div>
+                </div>
               )}
             </div>
-            {index === 2 && (
-              <div className="active-users">
-                <div className="user-avatars">
-                  <span className="avatar">👤</span>
-                  <span className="avatar">👤</span>
-                  <span className="avatar">👤</span>
-                  <span className="avatar">👤</span>
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="requests-section">
