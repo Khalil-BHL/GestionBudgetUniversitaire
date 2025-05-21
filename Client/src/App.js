@@ -1,9 +1,11 @@
-import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 
 import Login from "./LoginPage/login";
-
+// Admin components
+import AdminDashboard from "./AdminInterface/DashboardPage/dashboard";
+import AdminLayout from "./AdminInterface/layout";
+import UsermanagementPage from "./AdminInterface/UsermanagementPage/users";
 // Comptable components
 import ComptableDashboard from "./ComptableInterface/DashboardPage/Dashboard";
 import ComptableLayout from "./ComptableInterface/Layout";
@@ -12,16 +14,15 @@ import NotificationSend from "./ComptableInterface/NotificationSendPage/Notifica
 // Chef Departement components
 import ChefDepartementDashboard from "./ChefDepartementInterface/DashboardPage/Dashboard";
 import ChefDepartementLayout from "./ChefDepartementInterface/Layout";
-import RequestsList from "./ChefDepartementInterface/RequestsListPage/RequestsList";
-import ChefRequestPage from "./ChefDepartementInterface/RequestPage/RequestPage";
 import ChefNotifications from "./ChefDepartementInterface/Notifications/Notifications";
+import ChefRequestPage from "./ChefDepartementInterface/RequestPage/RequestPage";
+import RequestsList from "./ChefDepartementInterface/RequestsListPage/RequestsList";
 
 // Professor components
 import ProfDashboard from "./ProfInterface/DashboardPage/dashboard";
 import ProfLayout from "./ProfInterface/Layout";
-import RequestPage from "./ProfInterface/RequestPage/RequestPage";
 import ProfNotifications from "./ProfInterface/Notifications/Notifications";
-
+import RequestPage from "./ProfInterface/RequestPage/RequestPage";
 
 const DirectionDashboard = () => (
   <div>Direction Dashboard (To be implemented)</div>
@@ -34,6 +35,12 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Admin routes */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="users" element={<UsermanagementPage />} />
+        </Route>
+
         <Route path="/" element={<Login />} />
 
         {/* Professor routes */}
