@@ -112,8 +112,46 @@ const markNotificationAsRead = async (req, res) => {
   }
 };
 
+const deleteUserNotifications = async (req, res) => {
+  const connection = await pool.getConnection();
+  
+  try {
+    const userId = req.params.userId;
+
+    // Start transaction
+    await connection.beginTransaction();
+
+    // Delete all notifications for the user
+    await connection.query(
+      'DELETE FROM notifications WHERE destinator_user_id = ?',
+      [userId]
+    );
+
+    // Commit transaction
+    await connection.commit();
+
+    res.json({
+      status: 'success',
+      message: 'User notifications deleted successfully'
+    });
+
+  } catch (err) {
+    // Rollback in case of error
+    await connection.rollback();
+    console.error('Error deleting user notifications:', err);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to delete user notifications',
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  } finally {
+    connection.release();
+  }
+};
+
 module.exports = {
   sendNotification,
   getUserNotifications,
-  markNotificationAsRead
+  markNotificationAsRead,
+  deleteUserNotifications
 }; 

@@ -9,6 +9,7 @@ const departmentsRoutes = require("./routes/departmentsRoutes");
 const statusRoutes = require("./routes/statusRoutes");
 const userRoutes = require("./routes/userRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
+const roleRoutes = require("./routes/roleRoutes");
 
 
 // Load environment variables
@@ -29,6 +30,7 @@ app.use("/api/departments", departmentsRoutes);
 app.use("/api/status", statusRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/roles", roleRoutes);
 
 // Health check route
 app.get("/", (req, res) => {

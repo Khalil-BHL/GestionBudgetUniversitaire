@@ -1,6 +1,7 @@
 import axios from "axios";
 import "font-awesome/css/font-awesome.min.css";
 import { useEffect, useState } from "react";
+import Swal from 'sweetalert2';
 import "./dashboard.css"; // Assume que tu as les styles du dashboard ici
 
 function AdminUsers() {
@@ -8,64 +9,200 @@ function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [editingUser, setEditingUser] = useState(null);
+  const [departments, setDepartments] = useState([]);
+  const [roles, setRoles] = useState([]);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role_id: "",
+    department: "",
+  });
 
   // Charger les données au chargement
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get("http://localhost:5000/api/users/list");
-        setUsers(response.data);
-        
-        // Calculate stats from users data
-        const stats = [
-          {
-            title: "Total Users",
-            value: response.data.length,
-            icon: "fa-users",
-            color: "#4CAF50"
-          },
-          {
-            title: "Professors",
-            value: response.data.filter(user => user.role_id === 3).length,
-            icon: "fa-user-graduate",
-            color: "#2196F3"
-          },
-          {
-            title: "Chefs de Département",
-            value: response.data.filter(user => user.role_id === 4).length,
-            icon: "fa-user-tie",
-            color: "#FF9800"
-          }
-        ];
-        setStats(stats);
-      } catch (err) {
-        console.error("Error fetching users:", err);
-        setError("Failed to load users. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
+    fetchDepartments();
+    fetchRoles();
   }, []);
 
+  const fetchDepartments = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/departments");
+      if (response.data && Array.isArray(response.data)) {
+        setDepartments(response.data);
+      }
+    } catch (err) {
+      console.error("Error fetching departments:", err);
+    }
+  };
+
+  const fetchRoles = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/roles");
+      if (response.data && Array.isArray(response.data)) {
+        setRoles(response.data);
+      }
+    } catch (err) {
+      console.error("Error fetching roles:", err);
+    }
+  };
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await axios.get("http://localhost:5000/api/users/list");
+      const userData = response.data;
+      setUsers(userData);
+      
+      // Calculate stats from users data
+      const stats = [
+        {
+          title: "Total Users",
+          value: userData.length,
+          icon: "fa-users",
+          color: "#4CAF50"
+        },
+        {
+          title: "Direction",
+          value: userData.filter(user => user.role === "Direction").length,
+          icon: "fa-user-tie",
+          color: "#2196F3"
+        },
+        {
+          title: "Comptable",
+          value: userData.filter(user => user.role === "Comptable").length,
+          icon: "fa-calculator",
+          color: "#FF9800"
+        },
+        {
+          title: "Chefs de Département",
+          value: userData.filter(user => user.role_id === 4).length,
+          icon: "fa-user-tie",
+          color: "#9C27B0"
+        },
+        {
+          title: "Professeurs",
+          value: userData.filter(user => user.role_id === 3).length,
+          icon: "fa-user-graduate",
+          color: "#E91E63"
+        }
+      ];
+      setStats(stats);
+    } catch (err) {
+      console.error("Error fetching users:", err);
+      setError(err.response?.data?.message || "Failed to load users. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Fonction pour modifier un utilisateur
-  const handleEdit = (id) => {
-    alert("Modifier utilisateur ID: " + id);
-    // Ici tu peux ouvrir un modal, ou rediriger vers une page d'édition
+  const handleEdit = (user) => {
+    setEditingUser(user);
+    setEditForm({
+      name: user.name,
+      email: user.email,
+      password: "",
+      role_id: user.role_id,
+      department: user.department,
+    });
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.put(`http://localhost:5000/api/users/${editingUser.id}`, editForm);
+      setUsers(users.map(user => user.id === editingUser.id ? response.data : user));
+      setEditingUser(null);
+      setEditForm({
+        name: "",
+        email: "",
+        password: "",
+        role_id: "",
+        department: "",
+      });
+      // Refresh stats
+      fetchData();
+      
+      // Show success message
+      Swal.fire({
+        icon: 'success',
+        title: 'Succès!',
+        text: 'Utilisateur modifié avec succès',
+        timer: 2000,
+        showConfirmButton: false
+      });
+    } catch (err) {
+      console.error("Error updating user:", err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur!',
+        text: err.response?.data?.message || "Erreur lors de la modification de l'utilisateur"
+      });
+    }
+  };
+
+  const cancelEdit = () => {
+    setEditingUser(null);
+    setEditForm({
+      name: "",
+      email: "",
+      password: "",
+      role_id: "",
+      department: "",
+    });
   };
 
   // Fonction pour supprimer un utilisateur
   const handleDelete = async (id) => {
-    if (window.confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) {
+    const result = await Swal.fire({
+      title: 'Êtes-vous sûr?',
+      text: "Cette action est irréversible!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Oui, supprimer!',
+      cancelButtonText: 'Annuler'
+    });
+
+    if (result.isConfirmed) {
       try {
+        // First, delete related notifications
+        await axios.delete(`http://localhost:5000/api/notifications/user/${id}`);
+        
+        // Then delete the user
         await axios.delete(`http://localhost:5000/api/users/${id}`);
-        // Retirer l'utilisateur de la liste locale après suppression
-        setUsers(users.filter((user) => user.id !== id));
+        setUsers(users.filter(user => user.id !== id));
+        // Refresh stats
+        fetchData();
+        
+        Swal.fire({
+          icon: 'success',
+          title: 'Supprimé!',
+          text: 'Utilisateur et ses notifications supprimés avec succès',
+          timer: 2000,
+          showConfirmButton: false
+        });
       } catch (err) {
-        alert("Erreur lors de la suppression");
-        console.error(err);
+        console.error("Error deleting user:", err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur!',
+          text: err.response?.data?.message || "Erreur lors de la suppression de l'utilisateur. Veuillez réessayer plus tard."
+        });
       }
     }
   };
@@ -126,6 +263,114 @@ function AdminUsers() {
         ))}
       </div>
 
+      {/* Edit Modal */}
+      {editingUser && (
+        <div className="modal" style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000
+        }}>
+          <div className="modal-content" style={{
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '8px',
+            width: '400px'
+          }}>
+            <h3>Modifier l'utilisateur</h3>
+            <form onSubmit={handleEditSubmit}>
+              <input
+                name="name"
+                placeholder="Nom"
+                value={editForm.name}
+                onChange={handleEditChange}
+                required
+                style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
+              />
+              <input
+                name="email"
+                type="email"
+                placeholder="Email"
+                value={editForm.email}
+                onChange={handleEditChange}
+                required
+                style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
+              />
+              <input
+                name="password"
+                type="password"
+                placeholder="Nouveau mot de passe (optionnel)"
+                value={editForm.password}
+                onChange={handleEditChange}
+                style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
+              />
+              <select
+                name="role_id"
+                value={editForm.role_id}
+                onChange={handleEditChange}
+                required
+                style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
+              >
+                <option value="">Sélectionnez un rôle</option>
+                {roles.map(role => (
+                  <option key={role.id} value={role.id}>
+                    {role.name}
+                  </option>
+                ))}
+              </select>
+              <select
+                name="department"
+                value={editForm.department}
+                onChange={handleEditChange}
+                required
+                style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
+              >
+                <option value="">Sélectionnez un département</option>
+                {departments.map(dept => (
+                  <option key={dept.id} value={dept.name}>
+                    {dept.name}
+                  </option>
+                ))}
+              </select>
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={cancelEdit}
+                  style={{
+                    padding: '8px 16px',
+                    backgroundColor: '#ccc',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  style={{
+                    padding: '8px 16px',
+                    backgroundColor: '#2196F3',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Sauvegarder
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Table des utilisateurs */}
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
@@ -143,6 +388,9 @@ function AdminUsers() {
               Rôle
             </th>
             <th style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
+              Département
+            </th>
+            <th style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
               Actions
             </th>
           </tr>
@@ -153,16 +401,19 @@ function AdminUsers() {
               <td style={{ padding: "10px" }}>{user.id}</td>
               <td style={{ padding: "10px" }}>{user.name}</td>
               <td style={{ padding: "10px" }}>{user.email}</td>
-              <td style={{ padding: "10px" }}>
-                {user.role_id === 3 ? "Professeur" : "Chef de Département"}
-              </td>
+              <td style={{ padding: "10px" }}>{roles.find(r => r.id === user.role_id)?.name || user.role}</td>
+              <td style={{ padding: "10px" }}>{user.department}</td>
               <td style={{ padding: "10px" }}>
                 <button
-                  onClick={() => handleEdit(user.id)}
+                  onClick={() => handleEdit(user)}
                   style={{
                     marginRight: "10px",
                     padding: "5px 10px",
                     cursor: "pointer",
+                    backgroundColor: "#2196F3",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px"
                   }}
                 >
                   Modifier
@@ -175,6 +426,7 @@ function AdminUsers() {
                     backgroundColor: "#f44336",
                     color: "white",
                     border: "none",
+                    borderRadius: "4px"
                   }}
                 >
                   Supprimer
@@ -184,7 +436,7 @@ function AdminUsers() {
           ))}
           {users.length === 0 && (
             <tr>
-              <td colSpan="5" style={{ padding: "10px", textAlign: "center" }}>
+              <td colSpan="6" style={{ padding: "10px", textAlign: "center" }}>
                 Aucun utilisateur trouvé.
               </td>
             </tr>

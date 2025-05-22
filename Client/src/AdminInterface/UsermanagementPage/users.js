@@ -4,63 +4,116 @@ import "./users.css";
 const apiUrl = "http://localhost:5000/api/users";
 
 function App() {
-  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [departments, setDepartments] = useState([]);
+  const [roles, setRoles] = useState([]);
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
-    role: "Professeur",
+    role_id: "",
     department: "",
-    id: null,
   });
-  const [editing, setEditing] = useState(false);
+
+  // Roles that don't require departments
+  const nonDepartmentRoles = ["Admin", "Direction", "Comptable"];
 
   useEffect(() => {
-    fetch(apiUrl)
-      .then((res) => res.json())
-      .then((data) => setUsers(data));
+    // Fetch departments and roles when component mounts
+    fetchDepartments();
+    fetchRoles();
   }, []);
+
+  const fetchDepartments = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/departments");
+      if (!response.ok) throw new Error('Failed to fetch departments');
+      const data = await response.json();
+      setDepartments(data);
+    } catch (err) {
+      console.error("Error fetching departments:", err);
+      setError("Erreur lors du chargement des départements");
+    }
+  };
+
+  const fetchRoles = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/roles");
+      if (!response.ok) throw new Error('Failed to fetch roles');
+      const data = await response.json();
+      setRoles(data);
+      // Set default role if available
+      if (data.length > 0) {
+        setForm(prev => ({ ...prev, role_id: data[0].id }));
+      }
+    } catch (err) {
+      console.error("Error fetching roles:", err);
+      setError("Erreur lors du chargement des rôles");
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm(prev => {
+      const newForm = { ...prev, [name]: value };
+      
+      // If role changes, check if department should be cleared
+      if (name === 'role_id') {
+        const selectedRole = roles.find(r => r.id === parseInt(value));
+        if (selectedRole && nonDepartmentRoles.includes(selectedRole.name)) {
+          newForm.department = "";
+        }
+      }
+      
+      return newForm;
+    });
   };
 
-  const handleSubmit = (e) => {
+  const showSuccessMessage = (message) => {
+    setSuccessMessage(message);
+    setTimeout(() => setSuccessMessage(""), 3000);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    const selectedRole = roles.find(r => r.id === parseInt(form.role_id));
+    const requiresDepartment = selectedRole && !nonDepartmentRoles.includes(selectedRole.name);
+
+    // Validate department only if role requires it
+    if (requiresDepartment && !form.department) {
+      setError("Le département est requis pour ce rôle");
+      setLoading(false);
+      return;
+    }
 
     const payload = {
       name: form.name,
       email: form.email,
       password: form.password,
-      role: form.role,
-      department: form.department,
+      role_id: form.role_id,
+      department: requiresDepartment ? form.department : null,
     };
 
-    if (editing) {
-      fetch(`${apiUrl}/${form.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      })
-        .then((res) => res.json())
-        .then((updatedUser) => {
-          setUsers(
-            users.map((u) => (u.id === updatedUser.id ? updatedUser : u))
-          );
-          resetForm();
-        });
-    } else {
-      fetch(apiUrl, {
+    try {
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-      })
-        .then((res) => res.json())
-        .then((newUser) => {
-          setUsers([...users, newUser]);
-          resetForm();
-        });
+      });
+      
+      if (!response.ok) throw new Error('Failed to create user');
+      
+      showSuccessMessage("Utilisateur créé avec succès!");
+      resetForm();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,36 +122,20 @@ function App() {
       name: "",
       email: "",
       password: "",
-      role: "Professeur",
+      role_id: roles.length > 0 ? roles[0].id : "",
       department: "",
-      id: null,
     });
-    setEditing(false);
   };
 
-  const handleEdit = (user) => {
-    setForm({
-      name: user.name,
-      email: user.email,
-      password: "",
-      role: user.role,
-      department: user.department,
-      id: user.id,
-    });
-    setEditing(true);
-  };
-
-  const handleDelete = (id) => {
-    if (window.confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) {
-      fetch(`${apiUrl}/${id}`, { method: "DELETE" }).then(() => {
-        setUsers(users.filter((u) => u.id !== id));
-      });
-    }
-  };
+  const selectedRole = roles.find(r => r.id === parseInt(form.role_id));
+  const showDepartment = selectedRole && !nonDepartmentRoles.includes(selectedRole.name);
 
   return (
     <div className="container">
-      <h2>Gestion des Utilisateurs</h2>
+      <h2>Ajouter un Nouvel Utilisateur</h2>
+
+      {error && <div className="error-message">{error}</div>}
+      {successMessage && <div className="success-message">{successMessage}</div>}
 
       <form onSubmit={handleSubmit} className="form">
         <input
@@ -124,78 +161,47 @@ function App() {
           placeholder="Mot de passe"
           value={form.password}
           onChange={handleChange}
+          required
           className="input"
-          required={!editing}
         />
         <select
-          name="role"
-          value={form.role}
+          name="role_id"
+          value={form.role_id}
           onChange={handleChange}
           className="select"
           required
         >
-          <option value="Chef Département">Chef Département</option>
-          <option value="Professeur">Professeur</option>
+          <option value="">Sélectionnez un rôle</option>
+          {roles.map(role => (
+            <option key={role.id} value={role.id}>
+              {role.name}
+            </option>
+          ))}
         </select>
 
-        <select
-          name="department"
-          value={form.department}
-          onChange={handleChange}
-          className="select"
-          required
-        >
-          <option value="">Sélectionnez un département</option>
-          <option value="Informatique">Informatique</option>
-          <option value="Mathématiques">Mathématiques</option>
-          <option value="Physique">Physique</option>
-          <option value="Chimie">Chimie</option>
-        </select>
+        {showDepartment && (
+          <select
+            name="department"
+            value={form.department}
+            onChange={handleChange}
+            className="select"
+            required
+          >
+            <option value="">Sélectionnez un département</option>
+            {departments.map(dept => (
+              <option key={dept.id} value={dept.name}>
+                {dept.name}
+              </option>
+            ))}
+          </select>
+        )}
 
         <div className="buttonsGroup">
-          <button type="submit" className="btn btn-primary">
-            {editing ? "Modifier" : "Ajouter"}
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? "Chargement..." : "Ajouter"}
           </button>
-          {editing && (
-            <button
-              onClick={resetForm}
-              type="button"
-              className="btn btn-secondary"
-            >
-              Annuler
-            </button>
-          )}
         </div>
       </form>
-
-      <ul className="usersList">
-        {users.map((user) => (
-          <li
-            key={user.id}
-            className="userItem"
-            style={{
-              backgroundColor:
-                user.role === "Chef Département" ? "#E0F7FA" : "#F1F8E9",
-            }}
-          >
-            <div>
-              <strong>{user.name}</strong> — {user.email} — <em>{user.role}</em>{" "}
-              — {user.department}
-            </div>
-            <div>
-              <button onClick={() => handleEdit(user)} className="btn btn-edit">
-                Modifier
-              </button>
-              <button
-                onClick={() => handleDelete(user.id)}
-                className="btn btn-delete"
-              >
-                Supprimer
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }
