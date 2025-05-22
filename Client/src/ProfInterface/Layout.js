@@ -4,6 +4,7 @@ import {
   MdDashboard,
   MdLogout,
   MdNotifications,
+  MdBarChart ,
 } from "react-icons/md";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import "./Layout.css";
@@ -51,6 +52,14 @@ function Layout() {
                   <MdNotifications />
                 </span>
                 <span>Notifications</span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/professor/statistics" className="nav-item">
+                <span className="icon">
+                  <MdBarChart/>
+                </span>
+                <span>Statistiques</span>
               </Link>
             </li>
           </ul>

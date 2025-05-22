@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+
 const authRoutes = require("./routes/authRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const typeMarchesRoutes = require("./routes/typeMarchesRoutes");
@@ -10,7 +11,7 @@ const statusRoutes = require("./routes/statusRoutes");
 const userRoutes = require("./routes/userRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const roleRoutes = require("./routes/roleRoutes");
-
+const statisticsRoutes = require("./routes/statistics");
 
 // Load environment variables
 dotenv.config();
@@ -31,6 +32,7 @@ app.use("/api/status", statusRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/roles", roleRoutes);
+app.use("/api/statistics", statisticsRoutes);
 
 // Health check route
 app.get("/", (req, res) => {
