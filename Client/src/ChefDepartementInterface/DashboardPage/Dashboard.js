@@ -278,7 +278,7 @@ function Dashboard() {
               <strong>État :</strong> {selectedRequest.status}
             </p>
             <p>
-              <strong>Département :</strong> {selectedRequest.department_name || "—"}
+              <strong>Demandeur :</strong> {selectedRequest.user_name || "—"}
             </p>
             {selectedRequest.motif && (
               <p>

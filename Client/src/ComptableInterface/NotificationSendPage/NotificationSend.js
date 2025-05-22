@@ -57,7 +57,7 @@ function NotificationSend() {
   const fetchUsers = async () => {
     try {
       console.log("Fetching users...");
-      const response = await axios.get("http://localhost:5000/api/user/list", {
+      const response = await axios.get("http://localhost:5000/api/users/list", {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`

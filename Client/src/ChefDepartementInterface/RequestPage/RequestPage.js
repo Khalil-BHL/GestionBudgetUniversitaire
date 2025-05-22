@@ -45,10 +45,12 @@ function RequestPage() {
 
   const handleApprove = async () => {
     try {
+      const user = JSON.parse(localStorage.getItem("user"));
       const response = await axios.post("http://localhost:5000/api/dashboard/validate-request", {
         requestId: request.id,
         decision: 'approved',
-        comment: comment
+        comment: comment,
+        validatorId: user.id
       });
 
       if (response.data.status === 'success') {
@@ -64,11 +66,13 @@ function RequestPage() {
   const handleReject = async () => {
     if (showRejectionInput && rejectionReason.trim() !== '') {
       try {
+        const user = JSON.parse(localStorage.getItem("user"));
         const response = await axios.post("http://localhost:5000/api/dashboard/validate-request", {
           requestId: request.id,
           decision: 'rejected',
           rejectionReason: rejectionReason,
-          comment: comment
+          comment: comment,
+          validatorId: user.id
         });
 
         if (response.data.status === 'success') {

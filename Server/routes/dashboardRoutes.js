@@ -158,49 +158,76 @@ router.get("/request/:id", async (req, res) => {
 router.post("/validate-request", async (req, res) => {
   try {
     const { requestId, decision, comment, rejectionReason } = req.body;
+    const connection = await pool.getConnection();
     
-    if (decision === 'approved') {
-      // Get the status ID for "En cours d'examen"
-      const [statusResult] = await pool.query(
-        "SELECT id FROM status WHERE name = ?",
-        ["En cours d'examen"]
-      );
+    try {
+      await connection.beginTransaction();
+      
+      if (decision === 'approved') {
+        // Get the status ID for "En cours d'examen"
+        const [statusResult] = await connection.query(
+          "SELECT id FROM status WHERE name = ?",
+          ["En cours d'examen"]
+        );
 
-      if (statusResult.length === 0) {
-        return res.status(404).json({ error: "Status not found" });
+        if (statusResult.length === 0) {
+          await connection.rollback();
+          return res.status(404).json({ error: "Status not found" });
+        }
+
+        const statusId = statusResult[0].id;
+
+        // Update request status to "En cours d'examen" and store optional comment
+        await connection.query(
+          "UPDATE purchase_requests SET status_id = ?, motif = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+          [statusId, comment || null, requestId]
+        );
+
+        // Add validation record with a default comment if none provided
+        const validationComment = comment || "Demande approuvée par le chef de département";
+        await connection.query(
+          "INSERT INTO validations (request_id, validator_id, status_id, comment, validated_at) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)",
+          [requestId, req.body.validatorId, statusId, validationComment]
+        );
+      } else if (decision === 'rejected') {
+        // Get the status ID for "Rejeté"
+        const [statusResult] = await connection.query(
+          "SELECT id FROM status WHERE name = ?",
+          ["Rejeté"]
+        );
+
+        if (statusResult.length === 0) {
+          await connection.rollback();
+          return res.status(404).json({ error: "Status not found" });
+        }
+
+        const statusId = statusResult[0].id;
+
+        // Update request status to "Rejeté" and add rejection reason
+        await connection.query(
+          "UPDATE purchase_requests SET status_id = ?, motif = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+          [statusId, rejectionReason, requestId]
+        );
+
+        // Add validation record with rejection reason as comment
+        const validationComment = rejectionReason || "Demande rejetée par le chef de département";
+        await connection.query(
+          "INSERT INTO validations (request_id, validator_id, status_id, comment, validated_at) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)",
+          [requestId, req.body.validatorId, statusId, validationComment]
+        );
       }
 
-      const statusId = statusResult[0].id;
-
-      // Update request status to "En cours d'examen" and store optional comment
-      await pool.query(
-        "UPDATE purchase_requests SET status_id = ?, motif = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
-        [statusId, comment || null, requestId]
-      );
-    } else if (decision === 'rejected') {
-      // Get the status ID for "Rejeté"
-      const [statusResult] = await pool.query(
-        "SELECT id FROM status WHERE name = ?",
-        ["Rejeté"]
-      );
-
-      if (statusResult.length === 0) {
-        return res.status(404).json({ error: "Status not found" });
-      }
-
-      const statusId = statusResult[0].id;
-
-      // Update request status to "Rejeté" and add rejection reason
-      await pool.query(
-        "UPDATE purchase_requests SET status_id = ?, motif = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
-        [statusId, rejectionReason, requestId]
-      );
+      await connection.commit();
+      res.json({ 
+        status: "success",
+        message: decision === 'approved' ? "Request approved" : "Request rejected"
+      });
+    } catch (err) {
+      await connection.rollback();
+      throw err;
+    } finally {
+      connection.release();
     }
-
-    res.json({ 
-      status: "success",
-      message: decision === 'approved' ? "Request approved" : "Request rejected"
-    });
   } catch (err) {
     console.error("Error validating request:", err);
     res.status(500).json({ error: "Failed to validate request" });
