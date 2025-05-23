@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
-import { MdDashboard, MdList, MdNotifications, MdLogout } from 'react-icons/md';
+import { MdDashboard, MdNotifications, MdLogout } from 'react-icons/md';
 import './Layout.css';
 
 function Layout() {

@@ -59,7 +59,7 @@ router.get("/", async (req, res) => {
 
     // Compute some statistics
     const total = requests.length;
-    const approved = requests.filter((r) => r.status === "Approuvé").length;
+    const approved = requests.filter((r) => r.status_id > 3 && r.status_id !== 5).length;
     const inReview = requests.filter(
       (r) => r.status === "En cours d'examen"
     ).length;
