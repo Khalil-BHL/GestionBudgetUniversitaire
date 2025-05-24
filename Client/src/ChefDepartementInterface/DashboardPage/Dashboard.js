@@ -33,19 +33,40 @@ function Dashboard() {
       return;
     }
     
-    axios
-      .get("http://localhost:5000/api/dashboard", {
-        params: {
-          userId: user.id,
-          userRole: user.role
+    axios.get("http://localhost:5000/api/dashboard", {
+      params: {
+        userId: user.id,
+        userRole: user.role
+      }
+    })
+    .then((res) => {
+      // Update stats with translated titles and icons
+      const updatedStats = res.data.stats.map(stat => {
+        let newStat = { ...stat };
+        if (stat.title === "Total Requests") {
+          newStat.title = "Demandes totales";
+          newStat.icon = "fa-list-alt";
+          newStat.color = "#34c38f";
+        } else if (stat.title === "Approved") {
+          newStat.title = "Approuvées";
+          newStat.icon = "fa-check-circle";
+          newStat.color = "#34c38f";
+        } else if (stat.title === "Rejected") {
+          newStat.title = "Rejetées";
+          newStat.icon = "fa-times-circle";
+          newStat.color = "#f46a6a";
+        } else if (stat.title === "In Review") {
+          newStat.title = "En cours d'examen";
+          newStat.icon = "fa-spinner";
+          newStat.color = "#f1b44c";
         }
-      })
-      .then((res) => {
-        // Les demandes sont déjà filtrées par département côté serveur
-        setStats(res.data.stats);
-        setRequests(res.data.requests);
-        setFilteredRequests(res.data.requests);
-      })
+        return newStat;
+      });
+      
+      setStats(updatedStats);
+      setRequests(res.data.requests);
+      setFilteredRequests(res.data.requests);
+    })
       .catch((err) => {
         console.error("Erreur lors de la récupération des données", err);
       });

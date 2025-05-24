@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import './notifications.css';
+import { NotificationContext } from './NotificationContext';
 
 function formatDate(dateString) {
   return new Date(dateString).toLocaleString('fr-FR', {
@@ -13,6 +14,8 @@ function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { unreadCount, setUnreadCount, checkUnreadNotifications } = useContext(NotificationContext);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchNotifications();
@@ -30,17 +33,8 @@ function Notifications() {
         const fetchedNotifications = response.data.notifications;
         setNotifications(fetchedNotifications);
         
-        // Mark unread notifications as read
-        const unreadNotifications = fetchedNotifications.filter(n => !n.is_read);
-        if (unreadNotifications.length > 0) {
-          await Promise.all(
-            unreadNotifications.map(notification =>
-              axios.put(`http://localhost:5000/api/notifications/${notification.id}/read`)
-            )
-          );
-          // Update local state to reflect read status
-          setNotifications(fetchedNotifications.map(n => ({ ...n, is_read: true })));
-        }
+        // We're no longer automatically marking notifications as read
+        // or updating the unread count here
       } else {
         throw new Error(response.data.message || 'Failed to fetch notifications');
       }
@@ -52,6 +46,40 @@ function Notifications() {
     }
   };
 
+  // New function to mark all notifications as read
+  const markAllAsRead = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user) return;
+
+      const unreadNotifications = notifications.filter(n => !n.is_read);
+      
+      if (unreadNotifications.length > 0) {
+        await Promise.all(
+          unreadNotifications.map(notification =>
+            axios.put(`http://localhost:5000/api/notifications/${notification.id}/read`)
+          )
+        );
+        
+        // Update local state to reflect read status
+        setNotifications(notifications.map(n => ({ ...n, is_read: true })));
+        
+        // Reset unread count in context
+        setUnreadCount(0);
+      }
+    } catch (err) {
+      console.error('Error marking notifications as read:', err);
+    }
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchNotifications();
+    // Update the unread count after refreshing
+    checkUnreadNotifications();
+    setRefreshing(false);
+  };
+
   const handleMarkAsRead = async (notificationId) => {
     try {
       await axios.put(`http://localhost:5000/api/notifications/${notificationId}/read`);
@@ -61,6 +89,9 @@ function Notifications() {
           ? { ...notification, is_read: true }
           : notification
       ));
+      
+      // Update the unread count
+      checkUnreadNotifications();
     } catch (err) {
       console.error('Error marking notification as read:', err);
     }
@@ -95,7 +126,25 @@ function Notifications() {
   return (
     <div className="notifications-bg">
       <div className="notifications-container">
-        <h2 className="notifications-title">NOTIFICATIONS</h2>
+        <div className="notifications-header">
+          <h2 className="notifications-title">NOTIFICATIONS</h2>
+          <div>
+            <button 
+              className="mark-all-read-button"
+              onClick={markAllAsRead}
+              disabled={!notifications.some(n => !n.is_read)}
+            >
+              Tout marquer comme lu
+            </button>
+            <button 
+              className="refresh-button" 
+              onClick={handleRefresh}
+              disabled={refreshing}
+            >
+              {refreshing ? 'Actualisation...' : 'Actualiser'}
+            </button>
+          </div>
+        </div>
         <div className="notifications-card">
           {notifications.length === 0 ? (
             <div className="no-notifications">Aucune notification</div>
@@ -141,4 +190,4 @@ function Notifications() {
   );
 }
 
-export default Notifications; 
+export default Notifications;

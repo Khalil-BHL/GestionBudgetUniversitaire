@@ -2,6 +2,13 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 
 import Login from "./LoginPage/login";
+
+// Direction components
+import DirectionDashboard from "./DirectionInterface/DashboardPage/dashboard";
+import DirectionLayout from "./DirectionInterface/Layout";
+import DirectionNotifications from "./DirectionInterface/NotificationPage/Notifications";
+import { NotificationProvider as DirectionNotificationProvider } from "./DirectionInterface/NotificationPage/NotificationContext";
+
 // Comptable components
 import ComptableDashboard from "./ComptableInterface/DashboardPage/Dashboard";
 import ComptableLayout from "./ComptableInterface/Layout";
@@ -13,24 +20,22 @@ import ChefDepartementLayout from "./ChefDepartementInterface/Layout";
 import ChefNotifications from "./ChefDepartementInterface/Notifications/Notifications";
 import ChefRequestPage from "./ChefDepartementInterface/RequestPage/RequestPage";
 import RequestsList from "./ChefDepartementInterface/RequestsListPage/RequestsList";
+import { NotificationProvider as ChefNotificationProvider } from "./ChefDepartementInterface/Notifications/NotificationContext";
+
 
 // Professor components
 import ProfDashboard from "./ProfInterface/DashboardPage/dashboard";
 import ProfLayout from "./ProfInterface/Layout";
 import ProfNotifications from "./ProfInterface/Notifications/Notifications";
 import RequestPage from "./ProfInterface/RequestPage/RequestPage";
+import { NotificationProvider } from "./ProfInterface/Notifications/NotificationContext";
 
 // Admin components
 import AdminLayout from "./AdminInterface/layout";
 import AdminDashboard from "./AdminInterface/DashboardPage/dashboard";
 import UserManagement from "./AdminInterface/UsermanagementPage/users";
 
-const DirectionDashboard = () => (
-  <div>Direction Dashboard (To be implemented)</div>
-);
-const DirectionLayout = ({ children }) => (
-  <div className="dashboard-container">{children}</div>
-);
+
 
 function App() {
   return (
@@ -38,7 +43,11 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         {/* Professor routes */}
-        <Route path="/professor" element={<ProfLayout />}>
+        <Route path="/professor" element={
+          <NotificationProvider>
+            <ProfLayout />
+          </NotificationProvider>
+        }>
           <Route path="dashboard" element={<ProfDashboard />} />
           <Route path="request" element={<RequestPage />} />
           <Route path="notifications" element={<ProfNotifications />} />
@@ -51,12 +60,21 @@ function App() {
         </Route>
 
         {/* Direction routes */}
-        <Route path="/direction" element={<DirectionLayout />}>
+        <Route path="/direction" element={
+          <DirectionNotificationProvider>
+            <DirectionLayout />
+          </DirectionNotificationProvider>
+        }>
           <Route path="dashboard" element={<DirectionDashboard />} />
+          <Route path="notifications" element={<DirectionNotifications />} />
         </Route>
 
         {/* Chef Departement routes */}
-        <Route path="/chef-departement" element={<ChefDepartementLayout />}>
+        <Route path="/chef-departement" element={
+          <ChefNotificationProvider>
+            <ChefDepartementLayout />
+          </ChefNotificationProvider>
+        }>
           <Route path="dashboard" element={<ChefDepartementDashboard />} />
           <Route path="requests" element={<RequestsList />} />
           <Route path="request/:id" element={<ChefRequestPage />} />

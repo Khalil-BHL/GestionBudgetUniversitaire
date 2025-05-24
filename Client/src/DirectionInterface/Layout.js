@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { MdDashboard, MdList, MdNotifications, MdLogout } from 'react-icons/md';
 import './Layout.css';
-import { NotificationContext } from './Notifications/NotificationContext';
+import { NotificationContext } from './NotificationPage/NotificationContext';
 
 function Layout() {
   const navigate = useNavigate();
@@ -23,19 +23,14 @@ function Layout() {
         <nav className="sidebar-nav">
           <ul>
             <li>
-              <Link to="/chef-departement/dashboard" className="nav-item">
+              <Link to="/direction/dashboard" className="nav-item">
                 <span className="icon"><MdDashboard /></span>
                 <span>Tableau de bord</span>
               </Link>
             </li>
+            {/* You can add more navigation items here if needed */}
             <li>
-              <Link to="/chef-departement/requests" className="nav-item">
-                <span className="icon"><MdList /></span>
-                <span>Demandes à valider</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/chef-departement/notifications" className="nav-item">
+              <Link to="/direction/notifications" className="nav-item">
                 <span className="icon">
                   <MdNotifications />
                   {unreadCount > 0 && (
@@ -43,9 +38,6 @@ function Layout() {
                   )}
                 </span>
                 <span>Notifications</span>
-                {unreadCount > 0 && (
-                  <span className="notification-indicator"></span>
-                )}
               </Link>
             </li>
           </ul>

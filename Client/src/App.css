@@ -1,3 +1,9 @@
+/* Prevent horizontal scrolling globally */
+body, html {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 .App {
   text-align: center;
 }
