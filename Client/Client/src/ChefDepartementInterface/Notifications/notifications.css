@@ -1,0 +1,218 @@
+/* Add these styles to your existing notifications.css file */
+
+.notifications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.mark-all-read-button {
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.mark-all-read-button:hover {
+  background-color: #4b5563;
+}
+
+.mark-all-read-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.refresh-button {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.refresh-button:hover {
+  background-color: #2563eb;
+}
+
+.refresh-button:disabled {
+  background-color: #93c5fd;
+  cursor: not-allowed;
+}
+.notifications-bg {
+    background: #f5f7fa;
+    min-height: 100vh;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .notifications-container {
+    padding: 40px 20px;
+  }
+  
+  .notifications-title {
+    max-width: 1240px;
+    margin: 0 auto 30px auto;
+    color: #222;
+    font-size: 26px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-align: left;
+  }
+  
+  .notifications-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 30px 20px;
+    max-width: 1200px;
+    margin: auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  
+  .close-btn {
+    position: absolute;
+    left: 18px;
+    top: 27px;
+    background: #f2f4f8;
+    border: none;
+    font-size: 22px;
+    color: #bbb;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+  }
+  .close-btn:hover {
+    background: #e0e3ea;
+    color: #888;
+  }
+  
+  .notification-item {
+    position: relative;
+    padding: 0 60px 0 70px;
+    min-height: 80px;
+    display: flex;
+    align-items: flex-start;
+    transition: background-color 0.2s;
+  }
+
+  .notification-item.unread {
+    background-color: #f8f9fa;
+  }
+  
+  .notification-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    padding: 25px 0 10px 0;
+    flex-wrap: wrap;
+  }
+  
+  .notification-main {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .label {
+    display: inline-block;
+    padding: 2px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 7px;
+    margin-right: 10px;
+    vertical-align: middle;
+  }
+  .green { background: #22c55e; }
+  .orange { background: #f59e42; }
+  .purple { background: #7c3aed; }
+  .blue { background: #38bdf8; }
+  
+  .notification-sender {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 5px;
+    margin-top: 2px;
+    color: #222;
+    word-break: break-word;
+  }
+  
+  .notification-message {
+    color: #555;
+    font-size: 14px;
+    margin-bottom: 7px;
+    word-break: break-word;
+  }
+  
+  .notification-demandeid {
+    font-weight: bold;
+    color: #f43f5e;
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+  
+  .notification-time {
+    color: #aaa;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    min-width: 200px;
+    justify-content: flex-end;
+    white-space: nowrap;
+    padding-top: 2px;
+    margin-left: 30px;
+  }
+  
+  .clock-icon {
+    margin-right: 5px;
+    font-size: 15px;
+  }
+  
+  .notification-separator {
+    height: 2px;
+    background-color: #eee;
+    margin: 15px 60px 0 70px;
+  }
+
+  .error-message {
+    color: #dc2626;
+    font-size: 16px;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .no-notifications {
+    color: #6b7280;
+    font-size: 16px;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  @media (max-width: 768px) {
+    .notification-content {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .notification-time {
+      justify-content: flex-start;
+      margin-left: 0;
+      margin-top: 5px;
+      padding-top: 0;
+      white-space: normal;
+    }
+  }
+  
