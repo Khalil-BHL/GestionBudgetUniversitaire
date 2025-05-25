@@ -1,0 +1,454 @@
+.request-preview-container {
+    padding: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  
+  .request-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  
+  .request-preview-header h1 {
+    font-size: 1.8rem;
+    color: #333;
+    margin: 0;
+  }
+  
+  .request-status {
+    display: flex;
+    align-items: center;
+  }
+  
+  .status-badge {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+  
+  .status-submitted {
+    background-color: #e6f7ff;
+    color: #1890ff;
+  }
+  
+  .status-review {
+    background-color: #fff7e6;
+    color: #fa8c16;
+  }
+  
+  .status-approved {
+    background-color: #f6ffed;
+    color: #52c41a;
+  }
+  
+  .status-rejected {
+    background-color: #fff1f0;
+    color: #f5222d;
+  }
+  
+  .status-icon {
+    margin-right: 0.5rem;
+  }
+  
+  .request-preview-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+  }
+  
+  .request-id-section {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .request-id-section h2 {
+    font-size: 1.4rem;
+    margin: 0 0 0.5rem 0;
+    color: #333;
+  }
+  
+  .submission-date {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+  
+  .request-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .detail-item {
+    display: flex;
+    align-items: flex-start;
+  }
+  
+  .detail-icon {
+    background-color: #f5f5f5;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    color: #1890ff;
+    font-size: 1.2rem;
+  }
+  
+  .detail-content h3 {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0 0 0.3rem 0;
+    font-weight: normal;
+  }
+  
+  .detail-content p {
+    font-size: 1rem;
+    color: #333;
+    margin: 0;
+    font-weight: 500;
+  }
+  
+  .request-description-section {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .section-icon {
+    color: #1890ff;
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
+  }
+  
+  .section-header h3 {
+    font-size: 1.1rem;
+    margin: 0;
+    color: #333;
+  }
+  
+  .description-content p {
+    margin: 0;
+    line-height: 1.6;
+    color: #444;
+  }
+  
+  .request-timeline {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .request-timeline h3 {
+    font-size: 1.1rem;
+    margin: 0 0 1.5rem 0;
+    color: #333;
+  }
+  
+  .timeline {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
+  }
+  
+  .timeline:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 15px;
+    width: 2px;
+    background: #eee;
+  }
+  
+  .timeline-item {
+    position: relative;
+    padding-left: 40px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .timeline-marker {
+    position: absolute;
+    left: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 50%;
+    z-index: 1;
+  }
+  
+  .timeline-item.completed .timeline-marker {
+    color: #52c41a;
+  }
+  
+  .timeline-item.active .timeline-marker {
+    color: #fa8c16;
+  }
+  
+  .empty-marker {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #eee;
+  }
+  
+  .timeline-content {
+    padding-bottom: 1rem;
+  }
+  
+  .timeline-content h4 {
+    font-size: 1rem;
+    margin: 0 0 0.3rem 0;
+    color: #333;
+  }
+  
+  .timeline-content p {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0;
+  }
+  
+  .timeline-item.completed .timeline-content h4 {
+    color: #52c41a;
+  }
+  
+  .timeline-item.active .timeline-content h4 {
+    color: #fa8c16;
+  }
+  
+  /* Decision Section Styles */
+  .decision-section {
+    border-top: 1px solid #eee;
+    padding-top: 2rem;
+  }
+  
+  .decision-section h3 {
+    font-size: 1.1rem;
+    margin: 0 0 1.5rem 0;
+    color: #333;
+  }
+  
+  .comment-field {
+    margin-bottom: 1.5rem;
+  }
+  
+  .comment-field label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  .comment-field textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    resize: vertical;
+    font-family: inherit;
+  }
+  
+  .decision-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+  }
+  
+  .decision-buttons button {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .decision-buttons button svg {
+    margin-right: 0.5rem;
+  }
+  
+  .approve-button {
+    background-color: #52c41a;
+    color: white;
+  }
+  
+  .approve-button:hover {
+    background-color: #389e0d;
+  }
+  
+  .reject-button {
+    background-color: #f5222d;
+    color: white;
+  }
+  
+  .reject-button:hover {
+    background-color: #cf1322;
+  }
+  
+  .decision-result {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+  
+  .decision-result.approved {
+    background-color: #f6ffed;
+    border: 1px solid #b7eb8f;
+  }
+  
+  .decision-result.rejected {
+    background-color: #fff1f0;
+    border: 1px solid #ffa39e;
+  }
+  
+  .decision-icon {
+    font-size: 2rem;
+    margin-right: 1rem;
+  }
+  
+  .approved .decision-icon {
+    color: #52c41a;
+  }
+  
+  .rejected .decision-icon {
+    color: #f5222d;
+  }
+  
+  .decision-text h4 {
+    margin: 0 0 0.3rem 0;
+    font-size: 1.1rem;
+  }
+  
+  .decision-text p {
+    margin: 0;
+    color: #666;
+  }
+  
+  /* Add these new styles to your existing CSS file */
+  
+  .rejection-reason-container {
+    margin-top: 1.5rem;
+    border: 1px solid #ffccc7;
+    padding: 1.5rem;
+    border-radius: 8px;
+    background-color: #fff1f0;
+  }
+  
+  .rejection-reason-container label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #666;
+    font-weight: 500;
+  }
+  
+  .required {
+    color: #f5222d;
+  }
+  
+  .rejection-reason-container textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ffccc7;
+    border-radius: 4px;
+    resize: vertical;
+    font-family: inherit;
+    margin-bottom: 1rem;
+  }
+  
+  .rejection-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+  
+  .cancel-button {
+    padding: 0.8rem 1.5rem;
+    background-color: #f5f5f5;
+    color: #666;
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .confirm-reject-button {
+    padding: 0.8rem 1.5rem;
+    background-color: #f5222d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .confirm-reject-button:disabled {
+    background-color: #ffccc7;
+    cursor: not-allowed;
+  }
+  
+  .rejection-reason {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background-color: #fff1f0;
+    border-radius: 4px;
+  }
+
+  .loading-message,
+  .error-message {
+    text-align: center;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  }
+
+  .loading-message h2,
+  .error-message h2 {
+    color: #333;
+    margin-bottom: 1rem;
+  }
+
+  .loading-message p,
+  .error-message p {
+    color: #666;
+    margin-bottom: 1.5rem;
+  }
+
+  .error-message button {
+    padding: 0.5rem 1rem;
+    background-color: #5555ff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  .error-message button:hover {
+    background-color: #4444cc;
+  }

@@ -1,0 +1,134 @@
+.request-container {
+  background-color: white;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.request-container h1 {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.request-container p {
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.request-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.cancel-button {
+  padding: 12px 20px;
+  background-color: #f0f0f0;
+  color: #333;
+  border: none;
+  border-radius: 5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-button {
+  padding: 12px 20px;
+  background-color: #00a651;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.cancel-button:hover {
+  background-color: #e0e0e0;
+}
+
+.submit-button:hover {
+  background-color: #008c44;
+}
+
+/* Styles spécifiques pour les demandes ajoutées */
+.added-requests {
+  margin-top: 20px;
+}
+
+.request-card {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.request-card h3 {
+  font-size: 1.25rem;
+  margin-bottom: 10px;
+}
+
+.request-card p {
+  font-size: 1rem;
+  margin: 5px 0;
+}
+
+.request-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.edit-button,
+.delete-button {
+  padding: 8px 15px;
+  background-color: #7749f8;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.edit-button:hover,
+.delete-button:hover {
+  background-color: #5a32c2;
+}
+
+.delete-button {
+  background-color: #f44336;
+}
+
+.delete-button:hover {
+  background-color: #d32f2f;
+}

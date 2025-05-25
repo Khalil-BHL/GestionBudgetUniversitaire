@@ -1,0 +1,97 @@
+/* Inherit existing dashboard styles */
+@import '../../ChefDepartementInterface/DashboardPage/dashboard.css';
+
+/* Additional styles for filters */
+.filter-container {
+  display: flex;
+  gap: 15px;
+  margin-right: 15px;
+}
+
+.filter-select {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  min-width: 200px;
+  background-color: white;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #00a651;
+}
+
+/* Add these styles for the status dropdown */
+.status-dropdown-container {
+  position: relative;
+  min-width: 150px;
+}
+
+.status-dropdown {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  background-color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.status-badge {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.status-badge:hover {
+  opacity: 0.8;
+  transform: scale(1.05);
+}
+
+/* Make sure the clickable row has a pointer cursor */
+.clickable-row {
+  cursor: pointer;
+}
+
+/* Ensure the status cell doesn't trigger the row click */
+.clickable-row td:last-child {
+  position: relative;
+}
+
+/* Add these styles for fixed table column widths */
+.requests-table table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.requests-table th,
+.requests-table td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Optional: Add tooltip on hover for truncated content */
+.requests-table td {
+  position: relative;
+}
+
+.requests-table td:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: 0;
+  top: 100%;
+  z-index: 1;
+  background: white;
+  padding: 5px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  white-space: normal;
+  max-width: 300px;
+  display: none;
+}
+
+.requests-table td[title]:hover::after {
+  display: block;
+}
