@@ -46,6 +46,40 @@ function Notifications() {
     }
   };
 
+  // Function to mark all notifications as read
+  const markAllAsRead = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user) return;
+
+      const unreadNotifications = notifications.filter(n => !n.is_read);
+      
+      if (unreadNotifications.length > 0) {
+        await Promise.all(
+          unreadNotifications.map(notification =>
+            axios.put(`http://localhost:5000/api/notifications/${notification.id}/read`)
+          )
+        );
+        
+        // Update local state to reflect read status
+        setNotifications(notifications.map(n => ({ ...n, is_read: true })));
+        
+        // Reset unread count in context
+        setUnreadCount(0);
+      }
+    } catch (err) {
+      console.error('Error marking notifications as read:', err);
+    }
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchNotifications();
+    // Update the unread count after refreshing
+    checkUnreadNotifications();
+    setRefreshing(false);
+  };
+
   const handleMarkAsRead = async (notificationId) => {
     try {
       await axios.put(`http://localhost:5000/api/notifications/${notificationId}/read`);
@@ -55,43 +89,12 @@ function Notifications() {
           ? { ...notification, is_read: true }
           : notification
       ));
-      // Update unread count
+      
+      // Update the unread count
       checkUnreadNotifications();
     } catch (err) {
       console.error('Error marking notification as read:', err);
     }
-  };
-
-  const handleMarkAllAsRead = async () => {
-    try {
-      const unreadNotifications = notifications.filter(n => !n.is_read);
-      if (unreadNotifications.length === 0) return;
-
-      setRefreshing(true);
-      
-      await Promise.all(
-        unreadNotifications.map(notification =>
-          axios.put(`http://localhost:5000/api/notifications/${notification.id}/read`)
-        )
-      );
-      
-      // Update local state to reflect read status
-      setNotifications(notifications.map(n => ({ ...n, is_read: true })));
-      
-      // Update unread count
-      setUnreadCount(0);
-    } catch (err) {
-      console.error('Error marking all notifications as read:', err);
-    } finally {
-      setRefreshing(false);
-    }
-  };
-
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    await fetchNotifications();
-    await checkUnreadNotifications();
-    setRefreshing(false);
   };
 
   if (loading) {
@@ -123,9 +126,16 @@ function Notifications() {
   return (
     <div className="notifications-bg">
       <div className="notifications-container">
-        <h2 className="notifications-title">NOTIFICATIONS</h2>
-        <div className="notifications-card">
-          <div className="notifications-header">
+        <div className="notifications-header">
+          <h2 className="notifications-title">NOTIFICATIONS</h2>
+          <div>
+            <button 
+              className="mark-all-read-button"
+              onClick={markAllAsRead}
+              disabled={!notifications.some(n => !n.is_read)}
+            >
+              Tout marquer comme lu
+            </button>
             <button 
               className="refresh-button" 
               onClick={handleRefresh}
@@ -133,16 +143,9 @@ function Notifications() {
             >
               {refreshing ? 'Actualisation...' : 'Actualiser'}
             </button>
-            {notifications.some(n => !n.is_read) && (
-              <button 
-                className="mark-all-read-button" 
-                onClick={handleMarkAllAsRead}
-                disabled={refreshing}
-              >
-                Marquer tout comme lu
-              </button>
-            )}
           </div>
+        </div>
+        <div className="notifications-card">
           {notifications.length === 0 ? (
             <div className="no-notifications">Aucune notification</div>
           ) : (

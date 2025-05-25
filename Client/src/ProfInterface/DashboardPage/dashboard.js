@@ -27,18 +27,42 @@ function Dashboard() {
       return;
     }
 
-    axios
-      .get("http://localhost:5000/api/dashboard", {
-        params: {
-          userId: user.id,
-          userRole: user.role,
-        },
-      })
-      .then((res) => {
-        const professorRequests = res.data.requests.filter(
-          (request) => request.user_id === user.id
-        );
-        setStats(res.data.stats);
+    axios.get("http://localhost:5000/api/dashboard", {
+      params: {
+        userId: user.id,
+        userRole: user.role
+      }
+    })
+    .then((res) => {
+      const professorRequests = res.data.requests.filter(
+        (request) => request.user_id === user.id
+      );
+      
+      // Update stats with translated titles and icons
+            const updatedStats = res.data.stats.map(stat => {
+        let newStat = { ...stat };
+        if (stat.title === "Total Requests") {
+          newStat.title = "Demandes totales";
+          newStat.icon = "fa-list-alt";
+          newStat.color = "#34c38f";
+        } else if (stat.title === "Approved") {
+          newStat.title = "Approuvées";
+          newStat.icon = "fa-check-circle";
+          newStat.color = "#34c38f";
+        } else if (stat.title === "Rejected") {
+          newStat.title = "Rejetées";
+          newStat.icon = "fa-times-circle";
+          newStat.color = "#f46a6a";
+        } else if (stat.title === "In Review") {
+          newStat.title = "En cours d'examen";
+          newStat.icon = "fa-spinner";
+          newStat.color = "#f1b44c";
+        }
+        return newStat;
+
+      });
+      
+      setStats(updatedStats);
         setRequests(professorRequests);
         setFilteredRequests(professorRequests);
       })
@@ -113,49 +137,29 @@ function Dashboard() {
       </header>
 
       <div className="stats-container">
-        {stats.map((stat, index) => {
-          let iconClass = "fa-chart-bar";
-          if (stat.title.toLowerCase().includes("total"))
-            iconClass = "fa-file-alt";
-          else if (stat.title.toLowerCase().includes("approved"))
-            iconClass = "fa-check-circle";
-          else if (stat.title.toLowerCase().includes("review"))
-            iconClass = "fa-hourglass-half";
-
-          return (
-            <div className="stat-card" key={index}>
-              <div
-                className="stat-icon"
-                style={{ backgroundColor: stat.color }}
-              >
-                <i className={`fa ${iconClass}`}></i>
-              </div>
-              <div className="stat-info">
-                <p className="stat-title">{stat.title}</p>
-                <h3 className="stat-value">{stat.value}</h3>
-                {stat.change && (
-                  <p
-                    className={`stat-change ${
-                      stat.change.startsWith("+") ? "positive" : "negative"
-                    }`}
-                  >
-                    {stat.change} ce mois
-                  </p>
-                )}
-              </div>
-              {index === 2 && (
-                <div className="active-users">
-                  <div className="user-avatars">
-                    <span className="avatar">👤</span>
-                    <span className="avatar">👤</span>
-                    <span className="avatar">👤</span>
-                    <span className="avatar">👤</span>
-                  </div>
-                </div>
+        {stats.map((stat, index) => (
+          <div className="stat-card" key={index}>
+            <div
+              className="stat-icon"
+              style={{ backgroundColor: stat.color }}
+            >
+              <i className={`fa ${stat.icon}`}></i>
+            </div>
+            <div className="stat-info">
+              <p className="stat-title">{stat.title}</p>
+              <h3 className="stat-value">{stat.value}</h3>
+              {stat.change && (
+                <p
+                  className={`stat-change ${
+                    stat.change.startsWith("+") ? "positive" : "negative"
+                  }`}
+                >
+                  {stat.change} ce mois
+                </p>
               )}
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
 
       <div className="requests-section">

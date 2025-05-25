@@ -167,4 +167,36 @@
       white-space: normal;
     }
   }
+
+.notifications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.mark-all-read-button {
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s;
+  margin-right: 10px;
+}
+
+.mark-all-read-button:hover {
+  background-color: #4b5563;
+}
+
+.mark-all-read-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.notifications-header div {
+  display: flex;
+}
   

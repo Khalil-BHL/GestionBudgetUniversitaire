@@ -61,7 +61,7 @@ function AdminUsers() {
       // Calculate stats from users data
       const stats = [
         {
-          title: "Total Users",
+          title: "Total d'utilisateurs",
           value: userData.length,
           icon: "fa-users",
           color: "#4CAF50"
@@ -69,7 +69,7 @@ function AdminUsers() {
         {
           title: "Direction",
           value: userData.filter(user => user.role === "Direction").length,
-          icon: "fa-user-tie",
+          icon: "fa-building",
           color: "#2196F3"
         },
         {
@@ -81,13 +81,13 @@ function AdminUsers() {
         {
           title: "Chefs de Département",
           value: userData.filter(user => user.role_id === 4).length,
-          icon: "fa-user-tie",
+          icon: "fa-user-circle",  // Changed to a more basic icon
           color: "#9C27B0"
         },
         {
           title: "Professeurs",
           value: userData.filter(user => user.role_id === 3).length,
-          icon: "fa-user-graduate",
+          icon: "fa-user",  // Changed to a more basic icon
           color: "#E91E63"
         }
       ];
@@ -265,103 +265,84 @@ function AdminUsers() {
 
       {/* Edit Modal */}
       {editingUser && (
-        <div className="modal" style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 1000
-        }}>
-          <div className="modal-content" style={{
-            backgroundColor: 'white',
-            padding: '20px',
-            borderRadius: '8px',
-            width: '400px'
-          }}>
+        <div className="modal">
+          <div className="modal-content">
             <h3>Modifier l'utilisateur</h3>
             <form onSubmit={handleEditSubmit}>
-              <input
-                name="name"
-                placeholder="Nom"
-                value={editForm.name}
-                onChange={handleEditChange}
-                required
-                style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
-              />
-              <input
-                name="email"
-                type="email"
-                placeholder="Email"
-                value={editForm.email}
-                onChange={handleEditChange}
-                required
-                style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
-              />
-              <input
-                name="password"
-                type="password"
-                placeholder="Nouveau mot de passe (optionnel)"
-                value={editForm.password}
-                onChange={handleEditChange}
-                style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
-              />
-              <select
-                name="role_id"
-                value={editForm.role_id}
-                onChange={handleEditChange}
-                required
-                style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
-              >
-                <option value="">Sélectionnez un rôle</option>
-                {roles.map(role => (
-                  <option key={role.id} value={role.id}>
-                    {role.name}
-                  </option>
-                ))}
-              </select>
-              <select
-                name="department"
-                value={editForm.department}
-                onChange={handleEditChange}
-                required
-                style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
-              >
-                <option value="">Sélectionnez un département</option>
-                {departments.map(dept => (
-                  <option key={dept.id} value={dept.name}>
-                    {dept.name}
-                  </option>
-                ))}
-              </select>
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+              <div className="form-group">
+                <input
+                  name="name"
+                  placeholder="Nom"
+                  value={editForm.name}
+                  onChange={handleEditChange}
+                  required
+                  className="form-control"
+                />
+              </div>
+              <div className="form-group">
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="Email"
+                  value={editForm.email}
+                  onChange={handleEditChange}
+                  required
+                  className="form-control"
+                />
+              </div>
+              <div className="form-group">
+                <input
+                  name="password"
+                  type="password"
+                  placeholder="Nouveau mot de passe (optionnel)"
+                  value={editForm.password}
+                  onChange={handleEditChange}
+                  className="form-control"
+                />
+              </div>
+              <div className="form-group">
+                <select
+                  name="role_id"
+                  value={editForm.role_id}
+                  onChange={handleEditChange}
+                  required
+                  className="form-control"
+                >
+                  <option value="">Sélectionnez un rôle</option>
+                  {roles.map(role => (
+                    <option key={role.id} value={role.id}>
+                      {role.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group">
+                <select
+                  name="department"
+                  value={editForm.department}
+                  onChange={handleEditChange}
+                  required
+                  className="form-control"
+                >
+                  <option value="">Sélectionnez un département</option>
+                  {departments.map(dept => (
+                    <option key={dept.id} value={dept.name}>
+                      {dept.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-actions">
                 <button
                   type="button"
                   onClick={cancelEdit}
-                  style={{
-                    padding: '8px 16px',
-                    backgroundColor: '#ccc',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
+                  className="btn-cancel"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
-                  style={{
-                    padding: '8px 16px',
-                    backgroundColor: '#2196F3',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
+                  className="btn-save"
                 >
                   Sauvegarder
                 </button>

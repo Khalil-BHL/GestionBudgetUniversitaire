@@ -17,60 +17,7 @@ function Dashboard() {
   const [statuses, setStatuses] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [selectedTypeMarche, setSelectedTypeMarche] = useState("");
-  const [editingStatus, setEditingStatus] = useState(null);
   const requestsPerPage = 5;
-
-
-  // Function to update request status
-  const updateRequestStatus = async (requestId, newStatus) => {
-    try {
-      const user = JSON.parse(localStorage.getItem("user"));
-      if (!user) {
-        console.error("Utilisateur non connecté");
-        return;
-      }
-
-      // Make API call to update status and create validation record
-      const response = await axios.post("http://localhost:5000/api/dashboard/update-status", {
-        requestId,
-        newStatus,
-        validatorId: user.id,
-        validatorName: user.name
-      });
-
-      if (response.data.status === 'success') {
-        // Update the UI
-        const updatedRequests = requests.map(req => {
-          if (req.id === requestId) {
-            return { ...req, status: newStatus };
-          }
-          return req;
-        });
-        
-        setRequests(updatedRequests);
-        setFilteredRequests(updatedRequests);
-        setEditingStatus(null); // Close the dropdown
-        
-        // Show success message
-        Swal.fire({
-          position: "top-end",
-          icon: "success",
-          title: "Statut mis à jour avec succès",
-          showConfirmButton: false,
-          timer: 1500
-        });
-      }
-    } catch (err) {
-      console.error("Erreur lors de la mise à jour du statut:", err);
-      Swal.fire({
-        position: "top-end",
-        icon: "error",
-        title: "Erreur lors de la mise à jour du statut",
-        showConfirmButton: false,
-        timer: 1500
-      });
-    }
-  };
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -81,7 +28,7 @@ function Dashboard() {
       return;
     }
 
-    if (user.role !== 'Comptable') {
+    if (user.role !== 'Direction') {
       console.error("Accès non autorisé");
       window.location.href = "/";
       return;
@@ -142,7 +89,6 @@ function Dashboard() {
       }
     })
     .then((res) => {
-      console.log('Dashboard Data:', res.data);
       // Filter out requests with status IDs 1 and 5 before setting stats
       const filteredRequests = res.data.requests.filter(request => request.status_id !== 1 && request.status_id !== 5);
       
@@ -419,12 +365,7 @@ function Dashboard() {
                 <tr 
                   key={index} 
                   className="clickable-row"
-                  onClick={(e) => {
-                    // Only set selected request if we're not clicking on the status badge
-                    if (!e.target.closest('.status-badge')) {
-                      setSelectedRequest(request);
-                    }
-                  }}
+                  onClick={() => setSelectedRequest(request)}
                 >
                   <td title={request.id}>{request.id}</td>
                   <td title={request.title}>{request.title}</td>
@@ -436,32 +377,10 @@ function Dashboard() {
                       ? new Date(request.created_at).toLocaleDateString()
                       : "—"}
                   </td>
-                  <td onClick={(e) => e.stopPropagation()}>
-                    {editingStatus === request.id ? (
-                      <div className="status-dropdown-container">
-                        <select 
-                          className="status-dropdown"
-                          value={request.status}
-                          onChange={(e) => updateRequestStatus(request.id, e.target.value)}
-                          onBlur={() => setEditingStatus(null)}
-                        >
-                          {statuses
-                            .filter(status => status.id !== 1 && status.id !== 5)
-                            .map(status => (
-                              <option key={status.id} value={status.name}>
-                                {status.name}
-                              </option>
-                            ))}
-                        </select>
-                      </div>
-                    ) : (
-                      <span 
-                        className={`status-badge ${getStatusBadgeClass(request.status)}`}
-                        onClick={() => setEditingStatus(request.id)}
-                      >
-                        {request.status}
-                      </span>
-                    )}
+                  <td>
+                    <span className={`status-badge ${getStatusBadgeClass(request.status)}`}>
+                      {request.status}
+                    </span>
                   </td>
                 </tr>
               ))}

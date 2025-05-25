@@ -1,3 +1,51 @@
+/* Add these styles to your existing notifications.css file */
+
+.notifications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.mark-all-read-button {
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.mark-all-read-button:hover {
+  background-color: #4b5563;
+}
+
+.mark-all-read-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.refresh-button {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.refresh-button:hover {
+  background-color: #2563eb;
+}
+
+.refresh-button:disabled {
+  background-color: #93c5fd;
+  cursor: not-allowed;
+}
 .notifications-bg {
     background: #f5f7fa;
     min-height: 100vh;

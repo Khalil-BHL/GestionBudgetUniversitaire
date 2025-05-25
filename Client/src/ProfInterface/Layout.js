@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   MdAddCircleOutline,
   MdDashboard,
@@ -8,9 +8,11 @@ import {
 } from "react-icons/md";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import "./Layout.css";
+import { NotificationContext } from "./Notifications/NotificationContext";
 
 function Layout() {
   const navigate = useNavigate();
+  const { unreadCount } = useContext(NotificationContext);
 
   // Fonction simulant la déconnexion
   const handleLogout = () => {
@@ -50,8 +52,14 @@ function Layout() {
               <Link to="/professor/notifications" className="nav-item">
                 <span className="icon">
                   <MdNotifications />
+                  {unreadCount > 0 && (
+                    <span className="notification-badge">{unreadCount}</span>
+                  )}
                 </span>
                 <span>Notifications</span>
+                {unreadCount > 0 && (
+                  <span className="notification-indicator"></span>
+                )}
               </Link>
             </li>
             <li>
