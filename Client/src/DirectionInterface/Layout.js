@@ -1,16 +1,26 @@
 import React, { useContext } from 'react';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
-import { MdDashboard, MdList, MdNotifications, MdLogout, MdBarChart } from 'react-icons/md';
+import { Link, Outlet } from 'react-router-dom';
+import { MdDashboard, MdNotifications, MdLogout, MdBarChart } from 'react-icons/md';
 import './Layout.css';
 import { NotificationContext } from './NotificationPage/NotificationContext';
 
 function Layout() {
-  const navigate = useNavigate();
   const { unreadCount } = useContext(NotificationContext);
   
   const handleLogout = () => {
-    // Redirect to login page
-    navigate("/");
+    // Clear all session data
+    localStorage.removeItem("user");
+    localStorage.removeItem("authToken");
+    sessionStorage.clear();
+    
+    // Clear browser history and redirect to login
+    window.history.pushState(null, '', '/');
+    window.history.pushState(null, '', '/');
+    window.history.pushState(null, '', '/');
+    window.history.replaceState(null, '', '/');
+    
+    // Force reload to clear any cached data
+    window.location.href = '/';
   };
 
   return (

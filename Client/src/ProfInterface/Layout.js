@@ -5,18 +5,28 @@ import {
   MdLogout,
   MdNotifications,
 } from "react-icons/md";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import "./Layout.css";
 import { NotificationContext } from "./Notifications/NotificationContext";
 
 function Layout() {
-  const navigate = useNavigate();
   const { unreadCount } = useContext(NotificationContext);
 
   // Fonction simulant la déconnexion
   const handleLogout = () => {
+    // Clear all session data
+    localStorage.removeItem("user");
     localStorage.removeItem("authToken");
-    navigate("/");
+    sessionStorage.clear();
+    
+    // Clear browser history and redirect to login
+    window.history.pushState(null, '', '/');
+    window.history.pushState(null, '', '/');
+    window.history.pushState(null, '', '/');
+    window.history.replaceState(null, '', '/');
+    
+    // Force reload to clear any cached data
+    window.location.href = '/';
   };
 
   return (
