@@ -72,16 +72,6 @@ CREATE TABLE notifications (
     FOREIGN KEY (request_id) REFERENCES purchase_requests(id)
 );
 
--- Create budgets table
-CREATE TABLE budgets (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    department_id INT,
-    year INT NOT NULL,
-    allocated_amount DECIMAL(12,2),
-    spent_amount DECIMAL(12,2) DEFAULT 0,
-    FOREIGN KEY (department_id) REFERENCES departments(id)
-);
-
 -- Create validations table
 CREATE TABLE validations (
     id INT AUTO_INCREMENT PRIMARY KEY,

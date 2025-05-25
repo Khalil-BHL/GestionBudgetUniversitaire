@@ -12,8 +12,6 @@ function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const [rememberMe, setRememberMe] = useState(false);
-
   //useEffect(() => {
   // const savedEmail = localStorage.getItem("rememberedEmail");
   // if (savedEmail) {
@@ -137,15 +135,7 @@ function Login() {
                 </button>
               </div>
             </div>
-            <div className="remember-me-group">
-              <input
-                type="checkbox"
-                id="rememberMe"
-                checked={rememberMe}
-                onChange={() => setRememberMe(!rememberMe)}
-              />
-              <label htmlFor="rememberMe">Remember Me</label>
-            </div>
+
             <button type="submit" className="login-button" disabled={loading}>
               {loading ? "Logging in..." : "Login"}
             </button>
