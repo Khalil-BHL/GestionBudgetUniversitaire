@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
-import { MdDashboard, MdList, MdNotifications, MdLogout } from 'react-icons/md';
+import { MdDashboard, MdList, MdNotifications, MdLogout, MdBarChart } from 'react-icons/md';
 import './Layout.css';
 import { NotificationContext } from './NotificationPage/NotificationContext';
 
@@ -38,6 +38,17 @@ function Layout() {
                   )}
                 </span>
                 <span>Notifications</span>
+                {unreadCount > 0 && (
+                  <span className="notification-indicator"></span>
+                )}
+              </Link>
+            </li>
+            <li>
+              <Link to="/direction/statistics" className="nav-item">
+                <span className="icon">
+                  <MdBarChart />
+                </span>
+                <span>Statistiques</span>
               </Link>
             </li>
           </ul>

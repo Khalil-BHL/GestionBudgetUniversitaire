@@ -40,4 +40,4 @@ const UsersPerDepartmentPie = () => {
   );
 };
 
-export default UsersPerDepartmentPie;
+export default UsersPerDepartmentPie; 

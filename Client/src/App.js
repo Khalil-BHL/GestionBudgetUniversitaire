@@ -8,6 +8,7 @@ import Login from "./LoginPage/login";
 import DirectionDashboard from "./DirectionInterface/DashboardPage/dashboard";
 import DirectionLayout from "./DirectionInterface/Layout";
 import DirectionNotifications from "./DirectionInterface/NotificationPage/Notifications";
+import DirectionStatistics from "./DirectionInterface/Statistics/StatisticsPage";
 import { NotificationProvider as DirectionNotificationProvider } from "./DirectionInterface/NotificationPage/NotificationContext";
 
 // Comptable components
@@ -23,21 +24,17 @@ import ChefRequestPage from "./ChefDepartementInterface/RequestPage/RequestPage"
 import ChefNotifications from "./ChefDepartementInterface/Notifications/Notifications";
 import { NotificationProvider as ChefNotificationProvider } from "./ChefDepartementInterface/Notifications/NotificationContext";
 
-
 // Professor components
 import ProfDashboard from "./ProfInterface/DashboardPage/dashboard";
 import ProfLayout from "./ProfInterface/Layout";
 import RequestPage from "./ProfInterface/RequestPage/RequestPage";
 import ProfNotifications from "./ProfInterface/Notifications/Notifications";
-import StatisticsPage from "./ProfInterface/Statistics/StatisticsPage";
 import { NotificationProvider } from "./ProfInterface/Notifications/NotificationContext";
 
 // Admin components
 import AdminLayout from "./AdminInterface/layout";
 import AdminDashboard from "./AdminInterface/DashboardPage/dashboard";
 import UserManagement from "./AdminInterface/UsermanagementPage/users";
-
-
 
 function App() {
   return (
@@ -54,7 +51,6 @@ function App() {
           <Route path="dashboard" element={<ProfDashboard />} />
           <Route path="request" element={<RequestPage />} />
           <Route path="notifications" element={<ProfNotifications />} />
-          <Route path="statistics" element={<StatisticsPage />} />
         </Route>
 
         {/* Comptable routes */}
@@ -71,6 +67,7 @@ function App() {
         }>
           <Route path="dashboard" element={<DirectionDashboard />} />
           <Route path="notifications" element={<DirectionNotifications />} />
+          <Route path="statistics" element={<DirectionStatistics />} />
         </Route>
 
         {/* Chef Departement routes */}
@@ -83,6 +80,12 @@ function App() {
           <Route path="requests" element={<RequestsList />} />
           <Route path="request/:id" element={<ChefRequestPage />} />
           <Route path="notifications" element={<ChefNotifications />} />
+        </Route>
+
+        {/* Admin routes */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="users" element={<UserManagement />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -28,9 +28,8 @@ router.get("/approved-by-type-marche", async (req, res) => {
       FROM type_marches tm
       LEFT JOIN purchase_requests pr 
         ON pr.type_marche_id = tm.id 
-        AND pr.status_id = (
-          SELECT id FROM status WHERE name = 'Approuvé' LIMIT 1
-        )
+        AND pr.status_id > 3 
+        AND pr.status_id != 5
       GROUP BY tm.name
       ORDER BY tm.name
     `);
@@ -60,7 +59,5 @@ router.get("/users-per-department", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
-
 
 module.exports = router;
