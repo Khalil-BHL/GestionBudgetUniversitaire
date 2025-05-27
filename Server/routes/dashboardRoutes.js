@@ -105,6 +105,7 @@ router.get("/request/:id", async (req, res) => {
         pr.id,
         pr.title,
         pr.description,
+        pr.quantity,
         pr.created_at,
         pr.updated_at,
         pr.motif,

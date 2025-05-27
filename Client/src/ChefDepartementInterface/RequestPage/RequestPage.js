@@ -170,6 +170,7 @@ function RequestPage() {
           </div>
           <div className="description-content">
             <p>{request.description}</p>
+            <p><strong>Quantité:</strong> {request.quantity || "—"}</p>
           </div>
         </div>
 
